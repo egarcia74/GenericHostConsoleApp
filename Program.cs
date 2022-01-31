@@ -1,20 +1,38 @@
 ﻿using System.Reflection;
-using GenericHostConsoleApp;
+using GenericHostConsoleApp.Configuration;
+using GenericHostConsoleApp.Services;
+using GenericHostConsoleApp.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
+// Configure and start the application host. 
 await Host.CreateDefaultBuilder(args)
     .UseContentRoot(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
-    .ConfigureLogging(logging =>
+    .ConfigureAppConfiguration((_, builder) =>
     {
-        // Add any 3rd party loggers like NLog or Serilog
+	    builder.AddUserSecrets<Program>(true, true); 
+        builder.AddCommandLine(args, new Dictionary<string, string>
+        {
+            // Define parameter mappings.
+            { "-a1", "--arg1" },
+            { "-a2", "--arg2" }
+        });
     })
     .ConfigureServices((hostContext, services) =>
     {
         services
-            .AddHostedService<ConsoleHostedService>()
+            .AddHostedService<ApplicationHostedService>()
+            .AddTransient<IMainService, MainService>()
             .AddSingleton<IWeatherService, WeatherService>();
 
-        services.AddOptions<WeatherSettings>().Bind(hostContext.Configuration.GetSection("Weather"));
+        services
+            .AddOptions<WeatherOptions>()
+            .Bind(hostContext.Configuration.GetSection(nameof(WeatherOptions)))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
     })
-    .RunConsoleAsync();
+    .UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration))
+    .RunConsoleAsync()
+    .ConfigureAwait(false);
