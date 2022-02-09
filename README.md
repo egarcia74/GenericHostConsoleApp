@@ -3,7 +3,8 @@
 A console app example
 using [.NET Generic Host](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host).
 
-This code is derived from [David Federman's](https://github.com/dfederm) original code: https://github.com/dfederm/GenericHostConsoleApp
+This code is derived from [David Federman's](https://github.com/dfederm) original
+code: https://github.com/dfederm/GenericHostConsoleApp
 
 For more details, refer to his original [blog post](https://dfederm.com/building-a-console-app-with-.net-generic-host/).
 
@@ -17,5 +18,6 @@ This version adds a few extra bells and whistles such as:
 * Using an **ExitCode** enum to define return values.
 * [Compile-time logging source generation](https://docs.microsoft.com/en-us/dotnet/core/extensions/logger-message-generator)
   .
-* [Validation of configuration options](https://docs.microsoft.com/en-us/dotnet/core/extensions/options#options-validation).
+* [Validation of configuration options](https://docs.microsoft.com/en-us/dotnet/core/extensions/options#options-validation)
+  .
 * [Serilog](https://serilog.net) as the logging provider.

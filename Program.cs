@@ -12,7 +12,7 @@ await Host.CreateDefaultBuilder(args)
     .UseContentRoot(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
     .ConfigureAppConfiguration((_, builder) =>
     {
-	    builder.AddUserSecrets<Program>(true, true); 
+        builder.AddUserSecrets<Program>(true, true);
         builder.AddCommandLine(args, new Dictionary<string, string>
         {
             // Define parameter mappings.

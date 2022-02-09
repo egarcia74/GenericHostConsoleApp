@@ -4,7 +4,7 @@ using GenericHostConsoleApp.Services;
 namespace GenericHostConsoleApp.Configuration;
 
 /// <summary>
-/// Configuration options for <see cref="WeatherService"/>.
+///     Configuration options for <see cref="WeatherService" />.
 /// </summary>
 public sealed class WeatherOptions
 {
