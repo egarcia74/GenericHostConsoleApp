@@ -1,3 +1,4 @@
+using GenericHostConsoleApp.Helper;
 using GenericHostConsoleApp.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -43,8 +44,8 @@ public sealed partial class MainService : IMainService
     public async Task<ExitCode> Main(string[] args, CancellationToken cancellationToken)
     {
         // Command line arguments can be accessed either via the args parameter or via configuration.
-        LogConfigurationDetails("arg1", _configuration["arg1"]);
-        LogConfigurationDetails("arg2", _configuration["arg2"]);
+        _logger.LogConfigurationDetails("arg1", _configuration["arg1"]);
+        _logger.LogConfigurationDetails("arg2", _configuration["arg2"]);
 
         var temperatures = await _weatherService.GetFiveDayTemperaturesAsync(cancellationToken)
             .ConfigureAwait(false);
@@ -60,18 +61,10 @@ public sealed partial class MainService : IMainService
     }
 
     /// <summary>
-    ///     Logs details of configuration data.
-    /// </summary>
-    /// <param name="name">The name of the configuration item.</param>
-    /// <param name="value">The value of the configuration item.</param>
-    [LoggerMessage(100, LogLevel.Information, "Configuration: {Name} = {Value}")]
-    partial void LogConfigurationDetails(string name, string value);
-
-    /// <summary>
     ///     Logs a message indicating that the application was cancelled.
     /// </summary>
     /// <param name="dayOfWeek">The day of the week.</param>
     /// <param name="temperature">The temperature for the day.</param>
-    [LoggerMessage(101, LogLevel.Information, "The forecast for {DayOfWeek} is {Temperature}.")]
+    [LoggerMessage(100, LogLevel.Information, "The forecast for {DayOfWeek} is {Temperature}.")]
     partial void LogDailyForecast(DayOfWeek dayOfWeek, int temperature);
 }

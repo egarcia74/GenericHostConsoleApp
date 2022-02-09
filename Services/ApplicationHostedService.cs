@@ -1,3 +1,4 @@
+using GenericHostConsoleApp.Helper;
 using GenericHostConsoleApp.Services.Interfaces;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -7,7 +8,7 @@ namespace GenericHostConsoleApp.Services;
 /// <summary>
 ///     Hosted service that handles the application lifetime events and invokes the main application service.
 /// </summary>
-public sealed partial class ApplicationHostedService : IHostedService
+public sealed class ApplicationHostedService : IHostedService
 {
     // Service dependencies.
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
@@ -42,7 +43,7 @@ public sealed partial class ApplicationHostedService : IHostedService
     /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        LogApplicationStarting();
+        _logger.LogApplicationStarting();
 
         // Initialise the cancellation token source so that it is in the cancelled state if the
         // supplied token is in the cancelled state.
@@ -60,17 +61,17 @@ public sealed partial class ApplicationHostedService : IHostedService
         {
             var args = Environment.GetCommandLineArgs();
 
-            LogApplicationStarted(args);
+            _logger.LogApplicationStarted(args);
 
             // Execute the main service but do not await it here. The task will be awaited in StopAsync().
             _mainTask = ExecuteMainAsync(args, _cancellationTokenSource.Token);
         });
 
         // ApplicationStopping
-        _hostApplicationLifetime.ApplicationStopping.Register(LogApplicationStopping);
+        _hostApplicationLifetime.ApplicationStopping.Register(_logger.LogApplicationStopping);
 
         // ApplicationStopped
-        _hostApplicationLifetime.ApplicationStopped.Register(LogApplicationStopped);
+        _hostApplicationLifetime.ApplicationStopped.Register(_logger.LogApplicationStopped);
 
         return Task.CompletedTask;
     }
@@ -102,54 +103,8 @@ public sealed partial class ApplicationHostedService : IHostedService
 
         Environment.ExitCode = (int)exitCode;
 
-        LogApplicationExiting(exitCode, (int)exitCode);
+        _logger.LogApplicationExiting(exitCode, (int)exitCode);
     }
-
-    /// <summary>
-    ///     Logs the details of an unhandled exception.
-    /// </summary>
-    /// <param name="ex">The unhandled exception.</param>
-    [LoggerMessage(1, LogLevel.Critical, "An unhandled exception has occurred.")]
-    partial void LogUnhandledException(Exception ex);
-
-    /// <summary>
-    ///     Logs a message indicating that the application was cancelled.
-    /// </summary>
-    [LoggerMessage(2, LogLevel.Information, "Application was cancelled.")]
-    partial void LogApplicationCancelled();
-
-    /// <summary>
-    ///     Logs a message indicating that the application is starting.
-    /// </summary>
-    [LoggerMessage(3, LogLevel.Information, "Application is starting.")]
-    partial void LogApplicationStarting();
-
-    /// <summary>
-    ///     Logs a message indicating that the application has started.
-    /// </summary>
-    /// <param name="args">The command line arguments.</param>
-    [LoggerMessage(4, LogLevel.Information, "Application has started with args: \"{Args}\".")]
-    partial void LogApplicationStarted(string[] args);
-
-    /// <summary>
-    ///     Logs a message indicating that the application is stopping.
-    /// </summary>
-    [LoggerMessage(5, LogLevel.Information, "Application is stopping.")]
-    partial void LogApplicationStopping();
-
-    /// <summary>
-    ///     Logs a message indicating that the application has stopped.
-    /// </summary>
-    [LoggerMessage(6, LogLevel.Information, "Application has stopped.")]
-    partial void LogApplicationStopped();
-
-    /// <summary>
-    ///     Logs a message indicating that the application is exiting.
-    /// </summary>
-    /// <param name="exitCode">The exit code.</param>
-    /// <param name="exitCodeAsInt">The exit code as an <see cref="int" />.</param>
-    [LoggerMessage(7, LogLevel.Information, "Application is exiting with exit code: {ExitCode} ({ExitCodeAsInt}).")]
-    partial void LogApplicationExiting(ExitCode exitCode, int exitCodeAsInt);
 
     /// <summary>
     ///     Executes the <see cref="MainService.Main" /> method of the <see cref="MainService" /> and handles any exceptions.
@@ -168,13 +123,13 @@ public sealed partial class ApplicationHostedService : IHostedService
         catch (TaskCanceledException)
         {
             // This means the application is shutting down, so just swallow this exception.
-            LogApplicationCancelled();
+            _logger.LogApplicationCancelled();
 
             return ExitCode.Cancelled;
         }
         catch (Exception ex)
         {
-            LogUnhandledException(ex);
+            _logger.LogUnhandledException(ex);
 
             return ExitCode.UnhandledException;
         }
