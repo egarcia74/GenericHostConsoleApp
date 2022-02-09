@@ -2,6 +2,9 @@ using Microsoft.Extensions.Logging;
 
 namespace GenericHostConsoleApp.Helpers;
 
+/// <summary>
+///     Contains logger messages used throughout the application.
+/// </summary>
 public static partial class LoggerExtensions
 {
     /// <summary>
