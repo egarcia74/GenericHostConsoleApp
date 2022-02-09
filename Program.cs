@@ -16,8 +16,8 @@ await Host.CreateDefaultBuilder(args)
         builder.AddCommandLine(args, new Dictionary<string, string>
         {
             // Define parameter mappings.
-            { "-a1", "--arg1" },
-            { "-a2", "--arg2" }
+            { "-a1", "arg1" },
+            { "-a2", "arg2" }
         });
     })
     .ConfigureServices((hostContext, services) =>
