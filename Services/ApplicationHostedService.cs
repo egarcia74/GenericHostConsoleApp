@@ -1,4 +1,4 @@
-using GenericHostConsoleApp.Helper;
+using GenericHostConsoleApp.Helpers;
 using GenericHostConsoleApp.Services.Interfaces;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

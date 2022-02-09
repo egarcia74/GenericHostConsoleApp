@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace GenericHostConsoleApp.Helper;
+namespace GenericHostConsoleApp.Helpers;
 
 public static partial class LoggerExtensions
 {
