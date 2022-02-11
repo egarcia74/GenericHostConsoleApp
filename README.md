@@ -21,3 +21,4 @@ This version adds a few extra bells and whistles such as:
 * [Validation of configuration options](https://docs.microsoft.com/en-us/dotnet/core/extensions/options#options-validation)
   .
 * [Serilog](https://serilog.net) as the logging provider.
+* Unit tests using xUnit and Moq.
