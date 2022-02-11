@@ -1,7 +1,4 @@
-using GenericHostConsoleApp.Helpers;
 using GenericHostConsoleApp.Services.Interfaces;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace GenericHostConsoleApp.Services;
 
@@ -12,24 +9,22 @@ namespace GenericHostConsoleApp.Services;
 ///     This service implements the main application logic.
 ///     The method <see cref="Main" /> is executed once when the application executes.
 /// </remarks>
-public sealed partial class MainService : IMainService
+public sealed class MainService : IMainService
 {
+    private readonly IUserNotificationService _userNotificationService;
+
     // Service dependencies.
-    private readonly IConfiguration _configuration;
-    private readonly ILogger<MainService> _logger;
     private readonly IWeatherService _weatherService;
 
     /// <summary>
     ///     Initialises the <see cref="MainService" /> using the specified dependencies.
     /// </summary>
-    /// <param name="configuration">The application configuration.</param>
-    /// <param name="logger">The logger to use within this service.</param>
     /// <param name="weatherService">The weather service.</param>
-    public MainService(IConfiguration configuration, ILogger<MainService> logger, IWeatherService weatherService)
+    /// <param name="userNotificationService">The notification service.</param>
+    public MainService(IWeatherService weatherService, IUserNotificationService userNotificationService)
     {
-        _configuration = configuration;
-        _logger = logger;
         _weatherService = weatherService;
+        _userNotificationService = userNotificationService;
     }
 
     /// <summary>
@@ -43,28 +38,17 @@ public sealed partial class MainService : IMainService
     /// <returns>The application exit code.</returns>
     public async Task<ExitCode> Main(string[] args, CancellationToken cancellationToken)
     {
-        // Command line arguments can be accessed either via the args parameter or via configuration.
-        _logger.LogConfigurationDetails("arg1", _configuration["arg1"]);
-        _logger.LogConfigurationDetails("arg2", _configuration["arg2"]);
-
         var temperatures = await _weatherService.GetFiveDayTemperaturesAsync(cancellationToken)
             .ConfigureAwait(false);
 
         for (var i = 0; i < temperatures.Count; i++)
         {
-            if (cancellationToken.IsCancellationRequested) break;
+            cancellationToken.ThrowIfCancellationRequested();
 
-            LogDailyForecast(DateTime.Today.AddDays(i).DayOfWeek, temperatures[i]);
+            await _userNotificationService.NotifyDailyWeatherAsync(DateTime.Today.AddDays(i).DayOfWeek,
+                temperatures[i]);
         }
 
         return ExitCode.Success;
     }
-
-    /// <summary>
-    ///     Logs a message indicating that the application was cancelled.
-    /// </summary>
-    /// <param name="dayOfWeek">The day of the week.</param>
-    /// <param name="temperature">The temperature for the day.</param>
-    [LoggerMessage(100, LogLevel.Information, "The forecast for {DayOfWeek} is {Temperature}.")]
-    partial void LogDailyForecast(DayOfWeek dayOfWeek, int temperature);
 }

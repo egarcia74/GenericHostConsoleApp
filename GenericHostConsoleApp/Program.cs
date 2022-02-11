@@ -25,7 +25,8 @@ await Host.CreateDefaultBuilder(args)
         services
             .AddHostedService<ApplicationHostedService>()
             .AddTransient<IMainService, MainService>()
-            .AddSingleton<IWeatherService, WeatherService>();
+            .AddSingleton<IWeatherService, WeatherService>()
+            .AddSingleton<IUserNotificationService, UserNotificationService>();
 
         services
             .AddOptions<WeatherOptions>()

@@ -1,7 +1,7 @@
 namespace GenericHostConsoleApp.Services.Interfaces;
 
 /// <summary>
-///     Main application service.
+///     Main application service interface.
 /// </summary>
 public interface IMainService
 {
