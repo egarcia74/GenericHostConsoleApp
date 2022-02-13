@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 namespace GenericHostConsoleApp.Services;
 
 /// <summary>
-///     Handles user notifications from the application.
+///     User notification service
 /// </summary>
 public partial class UserNotificationService : IUserNotificationService
 {
