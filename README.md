@@ -22,3 +22,5 @@ This version adds a few extra bells and whistles such as:
   .
 * [Serilog](https://serilog.net) as the logging provider.
 * Unit tests using xUnit and Moq.
+
+[![.NET](https://github.com/egarcia74/GenericHostConsoleApp/actions/workflows/dotnet.yml/badge.svg)](https://github.com/egarcia74/GenericHostConsoleApp/actions/workflows/dotnet.yml)
