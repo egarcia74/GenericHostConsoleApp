@@ -11,5 +11,6 @@ public sealed class WeatherOptions
     // Indicates the unit of measure for the weather forecasts.
     [Required]
     [RegularExpression("^(?:C|F)$", ErrorMessage = "Unit must be either \"C\" or \"F\"")]
+    // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
     public string Unit { get; init; } = string.Empty;
 }
