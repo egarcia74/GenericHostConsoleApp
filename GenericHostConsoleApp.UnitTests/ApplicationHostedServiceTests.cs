@@ -13,7 +13,7 @@ namespace GenericHostConsoleApp.UnitTests;
 public class ApplicationHostedServiceTests
 {
     [Fact]
-    public async void StartAsync_StopAsync_OnSuccess_Invokes_MainService_Main()
+    public async Task StartAsync_StopAsync_OnSuccess_Invokes_MainService_Main()
     {
         // Arrange
         var cancellationToken = CancellationToken.None;
@@ -23,9 +23,9 @@ public class ApplicationHostedServiceTests
         var applicationHostedService = new ApplicationHostedService(applicationLifeTime, logger, mainService);
 
         // Act
-        await applicationHostedService.StartAsync(cancellationToken).ConfigureAwait(false);
+        await applicationHostedService.StartAsync(cancellationToken);
         applicationLifeTime.NotifyStarted();
-        await applicationHostedService.StopAsync(cancellationToken).ConfigureAwait(false);
+        await applicationHostedService.StopAsync(cancellationToken);
 
         // Assert
         Mock.Get(mainService)
@@ -35,7 +35,7 @@ public class ApplicationHostedServiceTests
     }
 
     [Fact]
-    public async void StartAsync_StopAsync_OnSuccess_ExitCode_Is_Success()
+    public async Task StartAsync_StopAsync_OnSuccess_ExitCode_Is_Success()
     {
         // Arrange
         var cancellationToken = CancellationToken.None;
@@ -49,16 +49,16 @@ public class ApplicationHostedServiceTests
             .ReturnsAsync(ExitCode.Success);
 
         // Act
-        await applicationHostedService.StartAsync(cancellationToken).ConfigureAwait(false);
+        await applicationHostedService.StartAsync(cancellationToken);
         applicationLifeTime.NotifyStarted();
-        await applicationHostedService.StopAsync(cancellationToken).ConfigureAwait(false);
+        await applicationHostedService.StopAsync(cancellationToken);
 
         // Assert
         Assert.Equal((int)ExitCode.Success, Environment.ExitCode);
     }
 
     [Fact]
-    public async void StartAsync_StopAsync_OnEarlyCancel_Never_Invokes_MainService_Main()
+    public async Task StartAsync_StopAsync_OnEarlyCancel_Never_Invokes_MainService_Main()
     {
         // Arrange
         var cancellationTokenSource = new CancellationTokenSource();
@@ -69,10 +69,10 @@ public class ApplicationHostedServiceTests
         var applicationHostedService = new ApplicationHostedService(applicationLifeTime, logger, mainService);
 
         // Act
-        await cancellationTokenSource.CancelAsync().ConfigureAwait(false);
-        await applicationHostedService.StartAsync(cancellationToken).ConfigureAwait(false);
+        await cancellationTokenSource.CancelAsync();
+        await applicationHostedService.StartAsync(cancellationToken);
         applicationLifeTime.NotifyStarted();
-        await applicationHostedService.StopAsync(cancellationToken).ConfigureAwait(false);
+        await applicationHostedService.StopAsync(cancellationToken);
 
         // Assert
         Mock.Get(mainService).Verify(service =>
@@ -81,7 +81,7 @@ public class ApplicationHostedServiceTests
     }
 
     [Fact]
-    public async void StartAsync_StopAsync_OnEarlyCancel_ExitCode_Is_Aborted()
+    public async Task StartAsync_StopAsync_OnEarlyCancel_ExitCode_Is_Aborted()
     {
         // Arrange
         var cancellationTokenSource = new CancellationTokenSource();
@@ -92,17 +92,17 @@ public class ApplicationHostedServiceTests
         var applicationHostedService = new ApplicationHostedService(applicationLifeTime, logger, mainService);
 
         // Act
-        await cancellationTokenSource.CancelAsync().ConfigureAwait(false);
-        await applicationHostedService.StartAsync(cancellationToken).ConfigureAwait(false);
+        await cancellationTokenSource.CancelAsync();
+        await applicationHostedService.StartAsync(cancellationToken);
         applicationLifeTime.NotifyStarted();
-        await applicationHostedService.StopAsync(cancellationToken).ConfigureAwait(false);
+        await applicationHostedService.StopAsync(cancellationToken);
 
         // Assert
         Assert.Equal((int)ExitCode.Aborted, Environment.ExitCode);
     }
 
     [Fact]
-    public async void StartAsync_StopAsync_OnTaskCancelledException_ExitCode_Is_Cancelled()
+    public async Task StartAsync_StopAsync_OnTaskCancelledException_ExitCode_Is_Cancelled()
     {
         // Arrange
         var cancellationToken = CancellationToken.None;
@@ -116,16 +116,16 @@ public class ApplicationHostedServiceTests
             .Throws<TaskCanceledException>();
 
         // Act
-        await applicationHostedService.StartAsync(cancellationToken).ConfigureAwait(false);
+        await applicationHostedService.StartAsync(cancellationToken);
         applicationLifeTime.NotifyStarted();
-        await applicationHostedService.StopAsync(cancellationToken).ConfigureAwait(false);
+        await applicationHostedService.StopAsync(cancellationToken);
 
         // Assert
         Assert.Equal((int)ExitCode.Cancelled, Environment.ExitCode);
     }
 
     [Fact]
-    public async void StartAsync_StopAsync_OnUnhandledException_ExitCode_Is_UnhandledException()
+    public async Task StartAsync_StopAsync_OnUnhandledException_ExitCode_Is_UnhandledException()
     {
         // Arrange
         var cancellationToken = CancellationToken.None;

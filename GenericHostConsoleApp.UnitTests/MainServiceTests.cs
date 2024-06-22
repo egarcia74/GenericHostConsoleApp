@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using GenericHostConsoleApp.Services;
 using GenericHostConsoleApp.Services.Interfaces;
 using Moq;
@@ -10,7 +11,7 @@ namespace GenericHostConsoleApp.UnitTests;
 public class MainServiceTests
 {
     [Fact]
-    public async void Main_OnSuccess_Returns_Success()
+    public async Task Main_OnSuccess_Returns_Success()
     {
         // Arrange
         var cancellationToken = CancellationToken.None;
@@ -24,14 +25,14 @@ public class MainServiceTests
             .ReturnsAsync(temperatures);
 
         // Act
-        var exitCode = await mainService.Main(Array.Empty<string>(), cancellationToken).ConfigureAwait(false);
+        var exitCode = await mainService.Main([], cancellationToken);
 
         // Assert
         Assert.Equal(ExitCode.Success, exitCode);
     }
 
     [Fact]
-    public async void Main_OnSuccess_Invokes_UserNotificationService_NotifyDailyWeatherAsync()
+    public async Task Main_OnSuccess_Invokes_UserNotificationService_NotifyDailyWeatherAsync()
     {
         // Arrange
         var cancellationToken = CancellationToken.None;
@@ -45,7 +46,7 @@ public class MainServiceTests
             .ReturnsAsync(temperatures);
 
         // Act
-        _ = await mainService.Main([], cancellationToken).ConfigureAwait(false);
+        _ = await mainService.Main([], cancellationToken);
 
         // Assert
         for (var i = 0; i < temperatures.Length; i++)
@@ -61,7 +62,7 @@ public class MainServiceTests
     }
 
     [Fact]
-    public async void Main_OnCancelled_Throws_OperationCanceledException()
+    public async Task Main_OnCancelled_Throws_OperationCanceledException()
     {
         // Arrange
         var cancellationTokenSource = new CancellationTokenSource();
@@ -71,7 +72,7 @@ public class MainServiceTests
         var mainService = new MainService(weatherService, notificationService);
         var temperatures = new[] { 71, 72, 73, 74, 79 };
 
-        await cancellationTokenSource.CancelAsync().ConfigureAwait(false);
+        await cancellationTokenSource.CancelAsync();
 
         Mock.Get(weatherService)
             .Setup(service => service.GetFiveDayTemperaturesAsync(It.IsAny<CancellationToken>()))
@@ -79,7 +80,6 @@ public class MainServiceTests
 
         // Act / assert
         await Assert.ThrowsAsync<OperationCanceledException>(async () =>
-                _ = await mainService.Main([], cancellationToken))
-            .ConfigureAwait(false);
+                _ = await mainService.Main([], cancellationToken));
     }
 }
