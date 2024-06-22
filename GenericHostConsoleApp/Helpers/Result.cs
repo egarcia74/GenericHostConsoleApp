@@ -65,8 +65,10 @@ public class Result
     /// <returns>
     ///     A successful <see cref="Result" /> instance.
     /// </returns>
-    public static Result Succeeded(object? context = null) =>
-        new(true, null, context);
+    public static Result Succeeded(object? context = null)
+    {
+        return new Result(true, null, context);
+    }
 
     /// <summary>
     ///     Creates a successful result for an operation that produces a value.
@@ -77,8 +79,10 @@ public class Result
     /// <returns>
     ///     A successful <see cref="Result{T}" /> instance containing the specified value.
     /// </returns>
-    public static Result<T> Succeeded<T>(T value, object? context = null) =>
-        new(true, null, context, value);
+    public static Result<T> Succeeded<T>(T value, object? context = null)
+    {
+        return new Result<T>(true, null, context, value);
+    }
 
     /// <summary>
     ///     Creates a failed result for an operation that does not produce a value.
@@ -88,8 +92,10 @@ public class Result
     /// <returns>
     ///     A failed <see cref="Result" /> instance.
     /// </returns>
-    public static Result Failed(Exception exception, object? context = null) =>
-        new(false, exception, context);
+    public static Result Failed(Exception exception, object? context = null)
+    {
+        return new Result(false, exception, context);
+    }
 
     /// <summary>
     ///     Creates a failed result for an operation that produces value.
@@ -100,8 +106,10 @@ public class Result
     /// <returns>
     ///     A failed <see cref="Result{T}" /> instance.
     /// </returns>
-    public static Result<T> Failed<T>(Exception exception, object? context = null) =>
-        new(false, exception, context, default);
+    public static Result<T> Failed<T>(Exception exception, object? context = null)
+    {
+        return new Result<T>(false, exception, context, default);
+    }
 }
 
 /// <summary>
