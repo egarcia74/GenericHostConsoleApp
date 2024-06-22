@@ -80,6 +80,6 @@ public class MainServiceTests
 
         // Act / assert
         await Assert.ThrowsAsync<OperationCanceledException>(async () =>
-                _ = await mainService.Main([], cancellationToken));
+            _ = await mainService.Main([], cancellationToken));
     }
 }

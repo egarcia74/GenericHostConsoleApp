@@ -9,11 +9,11 @@ using Serilog;
 
 // Configure and start the application host. 
 await Host.CreateDefaultBuilder(args)
-    .UseContentRoot(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
+    .UseContentRoot(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty)
     .ConfigureAppConfiguration((_, builder) =>
     {
         builder.AddUserSecrets<Program>(true, true);
-        
+
         // builder.AddCommandLine(args, new Dictionary<string, string>
         // {
         //     // Define parameter mappings.

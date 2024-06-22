@@ -129,9 +129,17 @@ public sealed class ApplicationHostedService : IHostedService
 
             return ExitCode.Cancelled;
         }
-        catch (Exception ex)
+        catch (ArgumentNullException ex)
         {
-            _logger.LogUnhandledException(ex);
+            // Handle ArgumentNullException
+            _logger.LogArgumentNullException(ex);
+
+            return ExitCode.UnhandledException;
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("specific error"))
+        {
+            // Handle InvalidOperationException with a specific message
+            _logger.LogInvalidOperationException(ex);
 
             return ExitCode.UnhandledException;
         }
