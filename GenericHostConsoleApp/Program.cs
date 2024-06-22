@@ -13,12 +13,13 @@ await Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration((_, builder) =>
     {
         builder.AddUserSecrets<Program>(true, true);
-        builder.AddCommandLine(args, new Dictionary<string, string>
-        {
-            // Define parameter mappings.
-            { "-a1", "arg1" },
-            { "-a2", "arg2" }
-        });
+        
+        // builder.AddCommandLine(args, new Dictionary<string, string>
+        // {
+        //     // Define parameter mappings.
+        //     { "-a1", "arg1" },
+        //     { "-a2", "arg2" }
+        // });
     })
     .ConfigureServices((hostContext, services) =>
     {
