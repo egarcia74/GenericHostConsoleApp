@@ -23,9 +23,9 @@ public class ApplicationHostedServiceTests
         var applicationHostedService = new ApplicationHostedService(applicationLifeTime, logger, mainService);
 
         // Act
-        await applicationHostedService.StartAsync(cancellationToken);
+        await applicationHostedService.StartAsync(cancellationToken).ConfigureAwait(false);
         applicationLifeTime.NotifyStarted();
-        await applicationHostedService.StopAsync(cancellationToken);
+        await applicationHostedService.StopAsync(cancellationToken).ConfigureAwait(false);
 
         // Assert
         Mock.Get(mainService)
@@ -49,9 +49,9 @@ public class ApplicationHostedServiceTests
             .ReturnsAsync(ExitCode.Success);
 
         // Act
-        await applicationHostedService.StartAsync(cancellationToken);
+        await applicationHostedService.StartAsync(cancellationToken).ConfigureAwait(false);
         applicationLifeTime.NotifyStarted();
-        await applicationHostedService.StopAsync(cancellationToken);
+        await applicationHostedService.StopAsync(cancellationToken).ConfigureAwait(false);
 
         // Assert
         Assert.Equal((int)ExitCode.Success, Environment.ExitCode);
@@ -69,10 +69,10 @@ public class ApplicationHostedServiceTests
         var applicationHostedService = new ApplicationHostedService(applicationLifeTime, logger, mainService);
 
         // Act
-        cancellationTokenSource.Cancel();
-        await applicationHostedService.StartAsync(cancellationToken);
+        await cancellationTokenSource.CancelAsync().ConfigureAwait(false);
+        await applicationHostedService.StartAsync(cancellationToken).ConfigureAwait(false);
         applicationLifeTime.NotifyStarted();
-        await applicationHostedService.StopAsync(cancellationToken);
+        await applicationHostedService.StopAsync(cancellationToken).ConfigureAwait(false);
 
         // Assert
         Mock.Get(mainService).Verify(service =>
@@ -92,10 +92,10 @@ public class ApplicationHostedServiceTests
         var applicationHostedService = new ApplicationHostedService(applicationLifeTime, logger, mainService);
 
         // Act
-        cancellationTokenSource.Cancel();
-        await applicationHostedService.StartAsync(cancellationToken);
+        await cancellationTokenSource.CancelAsync().ConfigureAwait(false);
+        await applicationHostedService.StartAsync(cancellationToken).ConfigureAwait(false);
         applicationLifeTime.NotifyStarted();
-        await applicationHostedService.StopAsync(cancellationToken);
+        await applicationHostedService.StopAsync(cancellationToken).ConfigureAwait(false);
 
         // Assert
         Assert.Equal((int)ExitCode.Aborted, Environment.ExitCode);
@@ -116,9 +116,9 @@ public class ApplicationHostedServiceTests
             .Throws<TaskCanceledException>();
 
         // Act
-        await applicationHostedService.StartAsync(cancellationToken);
+        await applicationHostedService.StartAsync(cancellationToken).ConfigureAwait(false);
         applicationLifeTime.NotifyStarted();
-        await applicationHostedService.StopAsync(cancellationToken);
+        await applicationHostedService.StopAsync(cancellationToken).ConfigureAwait(false);
 
         // Assert
         Assert.Equal((int)ExitCode.Cancelled, Environment.ExitCode);

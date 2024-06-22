@@ -46,7 +46,7 @@ public sealed class MainService : IMainService
             cancellationToken.ThrowIfCancellationRequested();
 
             await _userNotificationService.NotifyDailyWeatherAsync(DateTime.Today.AddDays(i).DayOfWeek,
-                temperatures[i]);
+                temperatures[i]).ConfigureAwait(false);
         }
 
         return ExitCode.Success;
