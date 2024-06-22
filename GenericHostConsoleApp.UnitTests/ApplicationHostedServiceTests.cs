@@ -125,7 +125,7 @@ public class ApplicationHostedServiceTests
     }
 
     [Fact]
-    public async Task StartAsync_StopAsync_OnUnhandledException_ExitCode_Is_UnhandledException()
+    public async Task StartAsync_StopAsync_OnArgumentNullException_ExitCode_Is_UnhandledException()
     {
         // Arrange
         var cancellationToken = CancellationToken.None;
@@ -136,7 +136,30 @@ public class ApplicationHostedServiceTests
 
         Mock.Get(mainService)
             .Setup(service => service.Main(It.IsAny<string[]>(), It.IsAny<CancellationToken>()))
-            .Throws<Exception>();
+            .Throws<ArgumentNullException>();
+
+        // Act
+        await applicationHostedService.StartAsync(cancellationToken);
+        applicationLifeTime.NotifyStarted();
+        await applicationHostedService.StopAsync(cancellationToken);
+
+        // Assert
+        Assert.Equal((int)ExitCode.UnhandledException, Environment.ExitCode);
+    }
+
+    [Fact]
+    public async Task StartAsync_StopAsync_OnInvalidOperationException_ExitCode_Is_UnhandledException()
+    {
+        // Arrange
+        var cancellationToken = CancellationToken.None;
+        var applicationLifeTime = new ApplicationLifetime(new NullLogger<ApplicationLifetime>());
+        var logger = new NullLogger<ApplicationHostedService>();
+        var mainService = Mock.Of<IMainService>();
+        var applicationHostedService = new ApplicationHostedService(applicationLifeTime, logger, mainService);
+
+        Mock.Get(mainService)
+            .Setup(service => service.Main(It.IsAny<string[]>(), It.IsAny<CancellationToken>()))
+            .Throws<ArgumentNullException>();
 
         // Act
         await applicationHostedService.StartAsync(cancellationToken);
