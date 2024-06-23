@@ -10,7 +10,8 @@ using Serilog.Exceptions;
 
 // Configure and start the application host. 
 await Host.CreateDefaultBuilder(args)
-    .UseContentRoot(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty)
+    .UseContentRoot(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
+                    ?? throw new InvalidOperationException($"Failed to get the path to the current assembly."))
     .ConfigureAppConfiguration((_, builder) =>
     {
         builder.AddUserSecrets<Program>(true, true);
