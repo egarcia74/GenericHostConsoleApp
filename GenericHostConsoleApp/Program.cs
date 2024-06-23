@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Serilog.Exceptions;
 
 // Configure and start the application host. 
 await Host.CreateDefaultBuilder(args)
@@ -35,6 +36,9 @@ await Host.CreateDefaultBuilder(args)
             .ValidateDataAnnotations()
             .ValidateOnStart();
     })
-    .UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration))
+    .UseSerilog((context, configuration) => 
+        configuration
+            .ReadFrom.Configuration(context.Configuration)
+            .Enrich.WithExceptionDetails())
     .RunConsoleAsync()
     .ConfigureAwait(false);
