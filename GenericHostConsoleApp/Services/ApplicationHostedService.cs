@@ -134,14 +134,14 @@ public sealed class ApplicationHostedService : IHostedService
             // Handle ArgumentNullException
             _logger.LogArgumentNullException(ex);
 
-            return ExitCode.UnhandledException;
+            return ExitCode.ArgumentNullException;
         }
         catch (InvalidOperationException ex) when (ex.Message.Contains("specific error"))
         {
             // Handle InvalidOperationException with a specific message
             _logger.LogInvalidOperationException(ex);
 
-            return ExitCode.UnhandledException;
+            return ExitCode.InvalidOperationException;
         }
         finally
         {

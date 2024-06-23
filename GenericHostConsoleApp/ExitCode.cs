@@ -23,5 +23,15 @@ public enum ExitCode
     /// <summary>
     ///     Indicates that the application was aborted.
     /// </summary>
-    Aborted
+    Aborted,
+    
+    /// <summary>
+    /// Indicates that there was an ArgumentNullException
+    /// </summary>
+    ArgumentNullException,
+    
+    /// <summary>
+    /// Indicates that there was an InvalidOperationException.
+    /// </summary>
+    InvalidOperationException
 }
