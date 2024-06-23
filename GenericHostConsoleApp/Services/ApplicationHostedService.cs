@@ -143,6 +143,12 @@ public sealed class ApplicationHostedService : IHostedService
 
             return ExitCode.InvalidOperationException;
         }
+        catch (Exception ex) // catch all other exceptions
+        {
+            _logger.LogUnhandledException(ex);
+            
+            return ExitCode.UnhandledException;
+        }
         finally
         {
             // Stop the application once the work is done.
