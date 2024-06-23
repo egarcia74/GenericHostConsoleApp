@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/GenericHostConsoleApp/bin/Debug/net6.0/GenericHostConsoleApp.dll",
+            "program": "${workspaceFolder}/GenericHostConsoleApp/bin/Debug/net8.0/GenericHostConsoleApp.dll",
             "args": [],
             "cwd": "${workspaceFolder}/GenericHostConsoleApp",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
