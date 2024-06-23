@@ -6,15 +6,9 @@ namespace GenericHostConsoleApp.Services;
 /// <summary>
 ///     User notification service
 /// </summary>
-public partial class UserNotificationService : IUserNotificationService
+public partial class UserNotificationService(ILogger<UserNotificationService> logger) : IUserNotificationService
 {
     // Service dependencies
-    private readonly ILogger<UserNotificationService> _logger;
-
-    public UserNotificationService(ILogger<UserNotificationService> logger)
-    {
-        _logger = logger;
-    }
 
     /// <summary>
     ///     Notifies the user of the daily weather forecast.

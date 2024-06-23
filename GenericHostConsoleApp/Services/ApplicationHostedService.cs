@@ -136,6 +136,13 @@ public sealed class ApplicationHostedService : IHostedService
 
             return ExitCode.ArgumentNullException;
         }
+        catch (ArgumentException ex)
+        {
+            // Handle ArgumentNullException
+            _logger.LogArgumentException(ex);
+
+            return ExitCode.ArgumentException;
+        }
         catch (InvalidOperationException ex)
         {
             // Handle InvalidOperationException with a specific message
