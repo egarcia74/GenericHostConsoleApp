@@ -125,7 +125,7 @@ public class ApplicationHostedServiceTests
     }
 
     [Fact]
-    public async Task StartAsync_StopAsync_OnArgumentNullException_ExitCode_Is_UnhandledException()
+    public async Task StartAsync_StopAsync_OnArgumentNullException_ExitCode_Is_ArgumentNullException()
     {
         // Arrange
         var cancellationToken = CancellationToken.None;
@@ -144,11 +144,11 @@ public class ApplicationHostedServiceTests
         await applicationHostedService.StopAsync(cancellationToken);
 
         // Assert
-        Assert.Equal((int)ExitCode.UnhandledException, Environment.ExitCode);
+        Assert.Equal((int)ExitCode.ArgumentNullException, Environment.ExitCode);
     }
 
     [Fact]
-    public async Task StartAsync_StopAsync_OnInvalidOperationException_ExitCode_Is_UnhandledException()
+    public async Task StartAsync_StopAsync_OnInvalidOperationException_ExitCode_Is_InvalidOperationException()
     {
         // Arrange
         var cancellationToken = CancellationToken.None;
@@ -159,7 +159,7 @@ public class ApplicationHostedServiceTests
 
         Mock.Get(mainService)
             .Setup(service => service.Main(It.IsAny<string[]>(), It.IsAny<CancellationToken>()))
-            .Throws<ArgumentNullException>();
+            .Throws<InvalidOperationException>();
 
         // Act
         await applicationHostedService.StartAsync(cancellationToken);
@@ -167,6 +167,6 @@ public class ApplicationHostedServiceTests
         await applicationHostedService.StopAsync(cancellationToken);
 
         // Assert
-        Assert.Equal((int)ExitCode.UnhandledException, Environment.ExitCode);
+        Assert.Equal((int)ExitCode.InvalidOperationException, Environment.ExitCode);
     }
 }

@@ -114,7 +114,7 @@ public sealed class ApplicationHostedService : IHostedService
     /// <param name="args">The command line arguments.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
-    ///     An <see cref="ExitCode" /> that indicates the outcome of the application..
+    ///     An <see cref="ExitCode" /> that indicates the outcome of the application.
     /// </returns>
     private async Task<ExitCode> ExecuteMainAsync(string[] args, CancellationToken cancellationToken)
     {
@@ -136,7 +136,7 @@ public sealed class ApplicationHostedService : IHostedService
 
             return ExitCode.ArgumentNullException;
         }
-        catch (InvalidOperationException ex) when (ex.Message.Contains("specific error"))
+        catch (InvalidOperationException ex)
         {
             // Handle InvalidOperationException with a specific message
             _logger.LogInvalidOperationException(ex);

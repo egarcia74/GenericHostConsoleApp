@@ -26,7 +26,7 @@ public enum ExitCode
     Aborted,
     
     /// <summary>
-    /// Indicates that there was an ArgumentNullException
+    /// Indicates that there was an ArgumentNullException.
     /// </summary>
     ArgumentNullException,
     
