@@ -39,7 +39,6 @@ await Host.CreateDefaultBuilder(args)
     })
     .UseSerilog((context, configuration) => 
         configuration
-            .ReadFrom.Configuration(context.Configuration)
-            .Enrich.WithExceptionDetails())
+            .ReadFrom.Configuration(context.Configuration))
     .RunConsoleAsync()
     .ConfigureAwait(false);
