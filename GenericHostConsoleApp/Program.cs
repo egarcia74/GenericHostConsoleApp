@@ -6,12 +6,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using Serilog.Exceptions;
 
 // Configure and start the application host. 
 await Host.CreateDefaultBuilder(args)
     .UseContentRoot(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
-                    ?? throw new InvalidOperationException($"Failed to get the path to the current assembly."))
+                    ?? throw new InvalidOperationException("Failed to get the path to the current assembly."))
     .ConfigureAppConfiguration((_, builder) =>
     {
         builder.AddUserSecrets<Program>(true, true);
@@ -40,5 +39,4 @@ await Host.CreateDefaultBuilder(args)
     .UseSerilog((context, configuration) => 
         configuration
             .ReadFrom.Configuration(context.Configuration))
-    .RunConsoleAsync()
-    .ConfigureAwait(false);
+    .RunConsoleAsync();

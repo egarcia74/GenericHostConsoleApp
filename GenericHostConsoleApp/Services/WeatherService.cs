@@ -36,7 +36,7 @@ public sealed partial class WeatherService : IWeatherService
     public async Task<IReadOnlyList<int>> GetFiveDayTemperaturesAsync(CancellationToken cancellationToken)
     {
         // Using Serilog's destructuring operator (@) in a log message.
-        if (_logger.IsEnabled(LogLevel.Information)) _logger.LogInformation("Using options {@Options}", _options.Value);
+        _logger.LogInformation("Using options {@Options}", _options.Value);
 
         LogFetchingWeather();
 
