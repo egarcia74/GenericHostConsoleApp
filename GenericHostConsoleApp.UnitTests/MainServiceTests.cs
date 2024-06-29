@@ -10,15 +10,32 @@ namespace GenericHostConsoleApp.UnitTests;
 
 public class MainServiceTests
 {
+    /// <summary>
+    /// Initializes the test with necessary mocks and instances.
+    /// </summary>
+    /// <param name="weatherService">Mocked Weather service instance.</param>
+    /// <param name="notificationService">Mocked User Notification service instance.</param>
+    /// <param name="mainService">Main Service instance created with provided mocks.</param>
+    /// <param name="temperatures">Array of integers representing temperatures.</param>
+    private static void InitializeTest(
+        out IWeatherService weatherService, 
+        out IUserNotificationService notificationService,
+        out MainService mainService, 
+        out int[] temperatures)
+    {
+        weatherService = Mock.Of<IWeatherService>();
+        notificationService = Mock.Of<IUserNotificationService>();
+        mainService = new MainService(weatherService, notificationService);
+        temperatures = [71, 72, 73, 74, 79 ];
+    }
+
     [Fact]
     public async Task Main_OnSuccess_Returns_Success()
     {
         // Arrange
         var cancellationToken = CancellationToken.None;
-        var weatherService = Mock.Of<IWeatherService>();
-        var notificationService = Mock.Of<IUserNotificationService>();
-        var mainService = new MainService(weatherService, notificationService);
-        int[] temperatures = [71, 72, 73, 74, 79 ];
+        
+        InitializeTest(out var weatherService, out _, out var mainService, out var temperatures);
 
         Mock.Get(weatherService)
             .Setup(service => service.GetFiveDayTemperaturesAsync(It.IsAny<CancellationToken>()))
@@ -36,10 +53,8 @@ public class MainServiceTests
     {
         // Arrange
         var cancellationToken = CancellationToken.None;
-        var weatherService = Mock.Of<IWeatherService>();
-        var notificationService = Mock.Of<IUserNotificationService>();
-        var mainService = new MainService(weatherService, notificationService);
-        int[] temperatures = [71, 72, 73, 74, 79 ];
+        
+        InitializeTest(out var weatherService, out var notificationService, out var mainService, out var temperatures);
 
         Mock.Get(weatherService)
             .Setup(service => service.GetFiveDayTemperaturesAsync(It.IsAny<CancellationToken>()))
@@ -67,10 +82,8 @@ public class MainServiceTests
         // Arrange
         var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
-        var weatherService = Mock.Of<IWeatherService>();
-        var notificationService = Mock.Of<IUserNotificationService>();
-        var mainService = new MainService(weatherService, notificationService);
-        int[] temperatures = [71, 72, 73, 74, 79 ];
+        
+        InitializeTest(out var weatherService, out _, out var mainService, out var temperatures);
 
         await cancellationTokenSource.CancelAsync();
 
