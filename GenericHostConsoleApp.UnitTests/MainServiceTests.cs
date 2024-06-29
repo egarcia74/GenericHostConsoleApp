@@ -18,7 +18,7 @@ public class MainServiceTests
         var weatherService = Mock.Of<IWeatherService>();
         var notificationService = Mock.Of<IUserNotificationService>();
         var mainService = new MainService(weatherService, notificationService);
-        var temperatures = new[] { 71, 72, 73, 74, 79 };
+        int[] temperatures = [71, 72, 73, 74, 79 ];
 
         Mock.Get(weatherService)
             .Setup(service => service.GetFiveDayTemperaturesAsync(It.IsAny<CancellationToken>()))
@@ -39,7 +39,7 @@ public class MainServiceTests
         var weatherService = Mock.Of<IWeatherService>();
         var notificationService = Mock.Of<IUserNotificationService>();
         var mainService = new MainService(weatherService, notificationService);
-        var temperatures = new[] { 71, 72, 73, 74, 79 };
+        int[] temperatures = [71, 72, 73, 74, 79 ];
 
         Mock.Get(weatherService)
             .Setup(service => service.GetFiveDayTemperaturesAsync(It.IsAny<CancellationToken>()))
@@ -70,7 +70,7 @@ public class MainServiceTests
         var weatherService = Mock.Of<IWeatherService>();
         var notificationService = Mock.Of<IUserNotificationService>();
         var mainService = new MainService(weatherService, notificationService);
-        var temperatures = new[] { 71, 72, 73, 74, 79 };
+        int[] temperatures = [71, 72, 73, 74, 79 ];
 
         await cancellationTokenSource.CancelAsync();
 
