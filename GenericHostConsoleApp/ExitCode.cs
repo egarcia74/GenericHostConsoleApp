@@ -24,19 +24,19 @@ public enum ExitCode
     ///     Indicates that the application was aborted.
     /// </summary>
     Aborted,
-    
+
     /// <summary>
-    /// Indicates that there was an ArgumentException.
+    ///     Indicates that there was an ArgumentException.
     /// </summary>
     ArgumentException,
-    
+
     /// <summary>
-    /// Indicates that there was an ArgumentNullException.
+    ///     Indicates that there was an ArgumentNullException.
     /// </summary>
     ArgumentNullException,
-    
+
     /// <summary>
-    /// Indicates that there was an InvalidOperationException.
+    ///     Indicates that there was an InvalidOperationException.
     /// </summary>
     InvalidOperationException
 }

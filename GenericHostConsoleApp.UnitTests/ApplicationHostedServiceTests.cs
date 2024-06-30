@@ -13,16 +13,16 @@ namespace GenericHostConsoleApp.UnitTests;
 public class ApplicationHostedServiceTests
 {
     /// <summary>
-    /// Initializes the test with necessary instances and mocks.
+    ///     Initializes the test with necessary instances and mocks.
     /// </summary>
     /// <param name="applicationLifeTime">Application lifetime.</param>
     /// <param name="logger">Logger instance for ApplicationHostedService.</param>
     /// <param name="mainService">Mocked Main Service instance.</param>
     /// <param name="applicationHostedService">Application Hosted Service using the provided instances.</param>
     private static void InitializeTest(
-        out ApplicationLifetime applicationLifeTime, 
+        out ApplicationLifetime applicationLifeTime,
         out NullLogger<ApplicationHostedService> logger,
-        out IMainService mainService, 
+        out IMainService mainService,
         out ApplicationHostedService applicationHostedService)
     {
         applicationLifeTime = new ApplicationLifetime(new NullLogger<ApplicationLifetime>());
@@ -36,7 +36,7 @@ public class ApplicationHostedServiceTests
     {
         // Arrange
         var cancellationToken = CancellationToken.None;
-        
+
         InitializeTest(out var applicationLifeTime, out _, out var mainService, out var applicationHostedService);
 
         // Act
@@ -56,7 +56,7 @@ public class ApplicationHostedServiceTests
     {
         // Arrange
         var cancellationToken = CancellationToken.None;
-        
+
         InitializeTest(out var applicationLifeTime, out _, out var mainService, out var applicationHostedService);
 
         Mock.Get(mainService)
@@ -78,9 +78,9 @@ public class ApplicationHostedServiceTests
         // Arrange
         var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
-        
+
         InitializeTest(out var applicationLifeTime, out _, out var mainService, out var applicationHostedService);
-        
+
         // Act
         await cancellationTokenSource.CancelAsync();
         await applicationHostedService.StartAsync(cancellationToken);
@@ -99,7 +99,7 @@ public class ApplicationHostedServiceTests
         // Arrange
         var cancellationTokenSource = new CancellationTokenSource();
         var cancellationToken = cancellationTokenSource.Token;
-        
+
         InitializeTest(out var applicationLifeTime, out _, out _, out var applicationHostedService);
 
         // Act
@@ -117,7 +117,7 @@ public class ApplicationHostedServiceTests
     {
         // Arrange
         var cancellationToken = CancellationToken.None;
-        
+
         InitializeTest(out var applicationLifeTime, out _, out var mainService, out var applicationHostedService);
 
         Mock.Get(mainService)
@@ -138,7 +138,7 @@ public class ApplicationHostedServiceTests
     {
         // Arrange
         var cancellationToken = CancellationToken.None;
-        
+
         InitializeTest(out var applicationLifeTime, out _, out var mainService, out var applicationHostedService);
 
         Mock.Get(mainService)
@@ -159,7 +159,7 @@ public class ApplicationHostedServiceTests
     {
         // Arrange
         var cancellationToken = CancellationToken.None;
-        
+
         InitializeTest(out var applicationLifeTime, out _, out var mainService, out var applicationHostedService);
 
         Mock.Get(mainService)

@@ -11,7 +11,7 @@ public partial class UserNotificationService : IUserNotificationService
     private readonly ILogger<UserNotificationService> _logger;
 
     /// <summary>
-    ///  Initializes a new instance of the <see cref="UserNotificationService" /> class.
+    ///     Initializes a new instance of the <see cref="UserNotificationService" /> class.
     /// </summary>
     /// <param name="logger">The logger to use within this service.</param>
     public UserNotificationService(ILogger<UserNotificationService> logger)
