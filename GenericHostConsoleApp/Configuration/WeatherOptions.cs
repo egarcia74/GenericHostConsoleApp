@@ -12,5 +12,5 @@ public sealed class WeatherOptions
     [Required]
     [RegularExpression("^(?:C|F)$", ErrorMessage = "Unit must be either \"C\" or \"F\"")]
     // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
-    public required string Unit { get; init; } = string.Empty;
+    public required string Unit { get; init; } = "C";
 }
