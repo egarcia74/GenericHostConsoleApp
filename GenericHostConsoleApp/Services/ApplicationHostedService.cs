@@ -6,7 +6,8 @@ using Microsoft.Extensions.Logging;
 namespace GenericHostConsoleApp.Services;
 
 /// <summary>
-///     Hosted service that handles the application lifetime events and invokes the main application service.
+/// Represents a hosted service in an ASP.NET Core application or a .NET Core worker.
+/// A hosted service is a service that runs long-running background tasks, which typically run over the lifetime of your application.
 /// </summary>
 public sealed class ApplicationHostedService : IHostedService
 {
