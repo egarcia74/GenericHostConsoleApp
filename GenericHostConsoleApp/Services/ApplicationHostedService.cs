@@ -6,8 +6,9 @@ using Microsoft.Extensions.Logging;
 namespace GenericHostConsoleApp.Services;
 
 /// <summary>
-/// Represents a hosted service in an ASP.NET Core application or a .NET Core worker.
-/// A hosted service is a service that runs long-running background tasks, which typically run over the lifetime of your application.
+///     Represents a hosted service in an ASP.NET Core application or a .NET Core worker.
+///     A hosted service is a service that runs long-running background tasks, which typically run over the lifetime of
+///     your application.
 /// </summary>
 public sealed class ApplicationHostedService : IHostedService
 {
@@ -108,23 +109,23 @@ public sealed class ApplicationHostedService : IHostedService
 
         _logger.LogApplicationExiting(exitCode, (int)exitCode);
     }
-    
+
     /// <summary>
-    /// Executes the main service of the application asynchronously.
+    ///     Executes the main service of the application asynchronously.
     /// </summary>
     /// <param name="args">Command-line arguments passed to the main service.</param>
     /// <param name="cancellationToken">A token to signal the operation to cancel.</param>
     /// <returns>
-    /// A <see cref="Task"/> representing the result of the asynchronous operation. 
-    /// The result contains an <see cref="ExitCode"/> indicating the exit status of the application.
+    ///     A <see cref="Task" /> representing the result of the asynchronous operation.
+    ///     The result contains an <see cref="ExitCode" /> indicating the exit status of the application.
     /// </returns>
     /// <remarks>
-    /// This method calls the <c>Main</c> method of the main service defined by <c>_mainService</c>, 
-    /// passing in command-line arguments and cancellation token. 
-    /// In case of an exception, the exception is passed to <c>HandleException</c> method 
-    /// to handle it and return an appropriate exit code.
-    /// Regardless of success or failure, the application is then stopped by calling <c>StopApplication</c> 
-    /// method of <c>_hostApplicationLifetime</c>.
+    ///     This method calls the <c>Main</c> method of the main service defined by <c>_mainService</c>,
+    ///     passing in command-line arguments and cancellation token.
+    ///     In case of an exception, the exception is passed to <c>HandleException</c> method
+    ///     to handle it and return an appropriate exit code.
+    ///     Regardless of success or failure, the application is then stopped by calling <c>StopApplication</c>
+    ///     method of <c>_hostApplicationLifetime</c>.
     /// </remarks>
     private async Task<ExitCode> ExecuteMainAsync(string[] args, CancellationToken cancellationToken)
     {
@@ -142,9 +143,9 @@ public sealed class ApplicationHostedService : IHostedService
             _hostApplicationLifetime.StopApplication();
         }
     }
-    
+
     /// <summary>
-    /// Handles the given exception, logs it accordingly, and determines the appropriate exit code.
+    ///     Handles the given exception, logs it accordingly, and determines the appropriate exit code.
     /// </summary>
     /// <param name="ex">The exception that was thrown</param>
     /// <returns>The corresponding exit code</returns>

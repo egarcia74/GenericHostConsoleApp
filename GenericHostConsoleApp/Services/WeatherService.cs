@@ -43,12 +43,9 @@ public sealed partial class WeatherService : IWeatherService
         // Simulate some network latency
         await Task.Delay(2000, cancellationToken).ConfigureAwait(false);
 
-        var temperatures = new[] { 76, 76, 77, 79, 78 };
+        int[] temperatures = [76, 76, 77, 79, 78];
 
-        // If using Celsius then convert the temperatures.
-        if (_options.Value.Unit.Equals("C", StringComparison.OrdinalIgnoreCase))
-            for (var i = 0; i < temperatures.Length; i++)
-                temperatures[i] = (int)Math.Round((temperatures[i] - 32) / 1.8);
+        temperatures = ConvertToFahrenheit(temperatures);
 
         LogFetchWeatherSuccess();
 
@@ -66,4 +63,21 @@ public sealed partial class WeatherService : IWeatherService
     /// </summary>
     [LoggerMessage(201, LogLevel.Information, "Fetched weather successfully")]
     partial void LogFetchWeatherSuccess();
+
+    /// <summary>
+    ///     Converts an array of temperatures from Celsius to Fahrenheit if the unit of measure specified in the options is
+    ///     Celsius.
+    /// </summary>
+    /// <param name="temperatures">The array of temperatures to convert.</param>
+    /// <returns>The converted array of temperatures.</returns>
+    private int[] ConvertToFahrenheit(int[] temperatures)
+    {
+        if (!_options.Value.Unit.Equals("C", StringComparison.OrdinalIgnoreCase)) return temperatures;
+
+        // If using Fahrenheit then convert the temperatures.
+        for (var i = 0; i < temperatures.AsSpan().Length; i++)
+            temperatures[i] = (int)Math.Round((temperatures[i] - 32) / 1.8);
+
+        return temperatures;
+    }
 }
