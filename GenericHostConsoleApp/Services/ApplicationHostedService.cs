@@ -179,7 +179,13 @@ public sealed class ApplicationHostedService : IHostedService
         }
     }
 
-    private void RegisterEventHandler(IHostApplicationLifetime hostApplicationLifetime, Action action, string eventName)
+    /// <summary>
+    /// Registers an event handler for a specified application lifetime event.
+    /// </summary>
+    /// <param name="hostApplicationLifetime">The <see cref="IHostApplicationLifetime"/> instance.</param>
+    /// <param name="action">The action to be executed when the event is triggered.</param>
+    /// <param name="eventName">The name of the application lifetime event ("ApplicationStarted", "ApplicationStopping", or "ApplicationStopped").</param>
+    private static void RegisterEventHandler(IHostApplicationLifetime hostApplicationLifetime, Action action, string eventName)
     {
         switch (eventName)
         {
