@@ -58,8 +58,7 @@ public sealed class ApplicationHostedService : IHostedService
         // Register callbacks to handle the application lifetime events.
         //
 
-        // ApplicationStarted
-        _hostApplicationLifetime.ApplicationStarted.Register(() =>
+        RegisterEventHandler(_hostApplicationLifetime, () =>
         {
             var args = Environment.GetCommandLineArgs();
 
@@ -67,13 +66,10 @@ public sealed class ApplicationHostedService : IHostedService
 
             // Execute the main service but do not await it here. The task will be awaited in StopAsync().
             _mainTask = ExecuteMainAsync(args, _cancellationTokenSource.Token);
-        });
+        }, "ApplicationStarted");
 
-        // ApplicationStopping
-        _hostApplicationLifetime.ApplicationStopping.Register(_logger.LogApplicationStopping);
-
-        // ApplicationStopped
-        _hostApplicationLifetime.ApplicationStopped.Register(_logger.LogApplicationStopped);
+        RegisterEventHandler(_hostApplicationLifetime, _logger.LogApplicationStopping, "ApplicationStopping");
+        RegisterEventHandler(_hostApplicationLifetime, _logger.LogApplicationStopped, "ApplicationStopped");
 
         return Task.CompletedTask;
     }
@@ -180,6 +176,22 @@ public sealed class ApplicationHostedService : IHostedService
             default:
                 _logger.LogUnhandledException(ex);
                 return ExitCode.UnhandledException;
+        }
+    }
+
+    private void RegisterEventHandler(IHostApplicationLifetime hostApplicationLifetime, Action action, string eventName)
+    {
+        switch (eventName)
+        {
+            case "ApplicationStarted":
+                hostApplicationLifetime.ApplicationStarted.Register(action);
+                break;
+            case "ApplicationStopping":
+                hostApplicationLifetime.ApplicationStopping.Register(action);
+                break;
+            case "ApplicationStopped":
+                hostApplicationLifetime.ApplicationStopped.Register(action);
+                break;
         }
     }
 }

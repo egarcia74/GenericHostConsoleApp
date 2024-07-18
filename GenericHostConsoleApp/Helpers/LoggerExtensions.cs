@@ -95,11 +95,10 @@ public static partial class LoggerExtensions
 
 
     /// <summary>
-    /// Logs the details of an aggregate exception.
+    ///     Logs the details of an aggregate exception.
     /// </summary>
-    /// <param name="logger">The <see cref="ILogger"/> to use.</param>
+    /// <param name="logger">The <see cref="ILogger" /> to use.</param>
     /// <param name="ex">The aggregate exception.</param>
     [LoggerMessage(1, LogLevel.Critical, "An unhandled exception has occurred")]
     public static partial void LogAggregateException(this ILogger logger, Exception ex);
-
 }

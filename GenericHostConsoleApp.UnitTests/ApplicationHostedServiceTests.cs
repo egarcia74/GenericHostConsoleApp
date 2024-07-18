@@ -174,7 +174,7 @@ public class ApplicationHostedServiceTests
         // Assert
         Assert.Equal((int)ExitCode.InvalidOperationException, Environment.ExitCode);
     }
-    
+
     [Fact]
     public async Task StartAsync_StopAsync_OnAggregateException_ExitCode_Is_OnAggregateException()
     {
