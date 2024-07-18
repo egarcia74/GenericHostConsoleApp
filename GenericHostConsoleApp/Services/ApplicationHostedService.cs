@@ -172,7 +172,7 @@ public sealed class ApplicationHostedService : IHostedService
             case AggregateException aggregateException:
                 aggregateException.Handle(exception =>
                 {
-                    _logger.LogUnhandledException(exception);
+                    _logger.LogAggregateException(exception);
                     return true;
                 });
                 return ExitCode.AggregateException;
