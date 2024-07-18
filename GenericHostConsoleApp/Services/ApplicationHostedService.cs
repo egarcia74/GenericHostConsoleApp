@@ -169,6 +169,14 @@ public sealed class ApplicationHostedService : IHostedService
                 _logger.LogInvalidOperationException(invalidOperationException);
                 return ExitCode.InvalidOperationException;
 
+            case AggregateException aggregateException:
+                aggregateException.Handle(exception =>
+                {
+                    _logger.LogUnhandledException(exception);
+                    return true;
+                });
+                return ExitCode.AggregateException;
+
             default:
                 _logger.LogUnhandledException(ex);
                 return ExitCode.UnhandledException;

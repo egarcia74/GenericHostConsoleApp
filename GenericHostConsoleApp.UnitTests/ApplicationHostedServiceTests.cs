@@ -174,4 +174,25 @@ public class ApplicationHostedServiceTests
         // Assert
         Assert.Equal((int)ExitCode.InvalidOperationException, Environment.ExitCode);
     }
+    
+    [Fact]
+    public async Task StartAsync_StopAsync_OnAggregateException_ExitCode_Is_OnAggregateException()
+    {
+        // Arrange
+        var cancellationToken = CancellationToken.None;
+
+        InitializeTest(out var applicationLifeTime, out _, out var mainService, out var applicationHostedService);
+
+        Mock.Get(mainService)
+            .Setup(service => service.Main(It.IsAny<string[]>(), It.IsAny<CancellationToken>()))
+            .Throws<AggregateException>();
+
+        // Act
+        await applicationHostedService.StartAsync(cancellationToken);
+        applicationLifeTime.NotifyStarted();
+        await applicationHostedService.StopAsync(cancellationToken);
+
+        // Assert
+        Assert.Equal((int)ExitCode.AggregateException, Environment.ExitCode);
+    }
 }

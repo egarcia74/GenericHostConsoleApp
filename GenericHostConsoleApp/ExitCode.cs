@@ -38,5 +38,10 @@ public enum ExitCode
     /// <summary>
     ///     Indicates that there was an InvalidOperationException.
     /// </summary>
-    InvalidOperationException
+    InvalidOperationException,
+
+    /// <summary>
+    ///     Indicates that there was an AggregateException.
+    /// </summary>
+    AggregateException
 }
