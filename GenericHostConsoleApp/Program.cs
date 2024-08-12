@@ -15,7 +15,7 @@ await Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration((_, builder) =>
     {
         // Add user secrets to the configuration
-        builder.AddUserSecrets<Program>(true, true);
+        builder.AddUserSecrets<Program>(false, true);
 
         // Uncomment below code to add a command line configuration provider:
         // builder.AddCommandLine(args, new Dictionary<string, string>
@@ -35,9 +35,6 @@ await Host.CreateDefaultBuilder(args)
             .AddHttpClient<WeatherForecastService>();
 
         // Set up the application options.
-        services.Configure<WeatherForecastServiceOptions>(
-            hostContext.Configuration.GetSection("WeatherForecastServiceOptions"));
-
         services
             .AddOptions<WeatherForecastServiceOptions>()
             .Bind(hostContext.Configuration.GetSection(nameof(WeatherForecastServiceOptions)))

@@ -1,10 +1,12 @@
+using GenericHostConsoleApp.Configuration;
 using GenericHostConsoleApp.Services.Interfaces;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace GenericHostConsoleApp.Services;
 
 /// Represents a service for fetching weather forecasts.
-public class WeatherForecastService(IConfiguration configuration, HttpClient httpClient) : IWeatherForecastService
+public class WeatherForecastService(HttpClient httpClient, IOptions<WeatherForecastServiceOptions> options)
+    : IWeatherForecastService
 {
     /// <summary>
     ///     Fetches the weather forecast asynchronously.
@@ -15,11 +17,9 @@ public class WeatherForecastService(IConfiguration configuration, HttpClient htt
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var url = configuration.GetSection("WeatherForecastServiceOptions:Url").Value;
-        var apiKey = configuration.GetSection("WeatherForecastServiceOptions:ApiKey").Value;
-        var city = configuration.GetSection("WeatherForecastServiceOptions:City").Value;
-
-        var response = await httpClient.GetAsync($"{url}?q={city}&appid={apiKey}", cancellationToken);
+        var response =
+            await httpClient.GetAsync($"{options.Value.Url}?q={options.Value.City}&appid={options.Value.ApiKey}",
+                cancellationToken);
 
         if (!response.IsSuccessStatusCode)
             throw new Exception($"Failed to fetch weather data: Status: {response.StatusCode}; {response.Content}");
