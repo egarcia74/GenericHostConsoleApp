@@ -46,7 +46,8 @@ public sealed class MainService : IMainService
 
         var formattedForecast = JToken.Parse(forecast).ToString(Formatting.Indented);
 
-        _logger.LogInformation("Weather Forecast:\\n: {FormattedForecast}", formattedForecast);
+        // ReSharper disable once TemplateIsNotCompileTimeConstantProblem
+        _logger.LogInformation($"Weather Forecast:\n: {formattedForecast}");
 
         return ExitCode.Success;
     }
