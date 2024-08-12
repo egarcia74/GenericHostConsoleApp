@@ -2,11 +2,17 @@ using GenericHostConsoleApp.Configuration;
 using GenericHostConsoleApp.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Polly;
+using Polly.Timeout;
+using Polly.Wrap;
 
 namespace GenericHostConsoleApp.Services;
 
 /// Represents a service for fetching weather forecasts.
-public class WeatherForecastService(HttpClient httpClient, IOptions<WeatherForecastServiceOptions> options, ILogger<WeatherForecastService> logger)
+public class WeatherForecastService(
+    HttpClient httpClient,
+    IOptions<WeatherForecastServiceOptions> options,
+    ILogger<WeatherForecastService> logger)
     : IWeatherForecastService
 {
     /// <summary>
@@ -19,14 +25,53 @@ public class WeatherForecastService(HttpClient httpClient, IOptions<WeatherForec
         cancellationToken.ThrowIfCancellationRequested();
 
         var url = $"{options.Value.Url}?q={options.Value.City}&appid={options.Value.ApiKey}";
-        
+
         logger.LogInformation("OpenWeather Url: {url}", url);
 
-        var response = await httpClient.GetAsync(url, cancellationToken);
+        var policyWrap = GetPolicy();
+
+        var response = await policyWrap.ExecuteAsync(token => httpClient.GetAsync(url, token), cancellationToken);
 
         if (!response.IsSuccessStatusCode)
             throw new Exception($"Failed to fetch weather data: Status: {response.StatusCode}; {response.Content}");
 
         return await response.Content.ReadAsStringAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Retrieves the policy for handling retries, circuit breaking, and timeouts in the weather forecast service.
+    /// </summary>
+    /// <returns>
+    /// The policy wrap that combines the retry, circuit breaker, and timeout policies.
+    /// </returns>
+    private AsyncPolicyWrap GetPolicy()
+    {
+        var retryPolicy = Policy
+            .Handle<HttpRequestException>()
+            .WaitAndRetryAsync(6,
+                retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (exception, retryCount, context) =>
+                {
+                    logger.LogWarning($"Retry {retryCount} for policy: {context.PolicyKey}, due to: {exception}.");
+                });
+
+        var circuitBreakerPolicy = Policy
+            .Handle<HttpRequestException>()
+            .CircuitBreakerAsync(5, TimeSpan.FromMinutes(1),
+                (exception, breakDelay) =>
+                    logger.LogWarning($"Circuit breaker opened due to: {exception}. Break for: {breakDelay}"),
+                () => logger.LogInformation("Circuit breaker reset"));
+
+        var timeoutPolicy = Policy.TimeoutAsync(30,
+            TimeoutStrategy.Optimistic, // More appropriate for HttpClient
+            (context, timeSpan, _) =>
+            {
+                logger.LogWarning(
+                    $"Timeout from policy: {context.PolicyKey} after waiting {timeSpan.TotalSeconds} seconds.");
+
+                return Task.CompletedTask;
+            });
+       
+        return Policy.WrapAsync(retryPolicy, circuitBreakerPolicy, timeoutPolicy);
     }
 }
