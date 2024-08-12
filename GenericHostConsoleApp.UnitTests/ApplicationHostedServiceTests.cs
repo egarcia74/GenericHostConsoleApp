@@ -21,6 +21,7 @@ public class ApplicationHostedServiceTests
     /// <param name="applicationHostedService">Application Hosted Service using the provided instances.</param>
     private static void InitializeTest(
         out ApplicationLifetime applicationLifeTime,
+        // ReSharper disable once OutParameterValueIsAlwaysDiscarded.Local
         out NullLogger<ApplicationHostedService> logger,
         out IMainService mainService,
         out ApplicationHostedService applicationHostedService)
@@ -131,68 +132,5 @@ public class ApplicationHostedServiceTests
 
         // Assert
         Assert.Equal((int)ExitCode.Cancelled, Environment.ExitCode);
-    }
-
-    [Fact]
-    public async Task StartAsync_StopAsync_OnArgumentNullException_ExitCode_Is_ArgumentNullException()
-    {
-        // Arrange
-        var cancellationToken = CancellationToken.None;
-
-        InitializeTest(out var applicationLifeTime, out _, out var mainService, out var applicationHostedService);
-
-        Mock.Get(mainService)
-            .Setup(service => service.Main(It.IsAny<string[]>(), It.IsAny<CancellationToken>()))
-            .Throws<ArgumentNullException>();
-
-        // Act
-        await applicationHostedService.StartAsync(cancellationToken);
-        applicationLifeTime.NotifyStarted();
-        await applicationHostedService.StopAsync(cancellationToken);
-
-        // Assert
-        Assert.Equal((int)ExitCode.ArgumentNullException, Environment.ExitCode);
-    }
-
-    [Fact]
-    public async Task StartAsync_StopAsync_OnInvalidOperationException_ExitCode_Is_InvalidOperationException()
-    {
-        // Arrange
-        var cancellationToken = CancellationToken.None;
-
-        InitializeTest(out var applicationLifeTime, out _, out var mainService, out var applicationHostedService);
-
-        Mock.Get(mainService)
-            .Setup(service => service.Main(It.IsAny<string[]>(), It.IsAny<CancellationToken>()))
-            .Throws<InvalidOperationException>();
-
-        // Act
-        await applicationHostedService.StartAsync(cancellationToken);
-        applicationLifeTime.NotifyStarted();
-        await applicationHostedService.StopAsync(cancellationToken);
-
-        // Assert
-        Assert.Equal((int)ExitCode.InvalidOperationException, Environment.ExitCode);
-    }
-
-    [Fact]
-    public async Task StartAsync_StopAsync_OnAggregateException_ExitCode_Is_OnAggregateException()
-    {
-        // Arrange
-        var cancellationToken = CancellationToken.None;
-
-        InitializeTest(out var applicationLifeTime, out _, out var mainService, out var applicationHostedService);
-
-        Mock.Get(mainService)
-            .Setup(service => service.Main(It.IsAny<string[]>(), It.IsAny<CancellationToken>()))
-            .Throws<AggregateException>();
-
-        // Act
-        await applicationHostedService.StartAsync(cancellationToken);
-        applicationLifeTime.NotifyStarted();
-        await applicationHostedService.StopAsync(cancellationToken);
-
-        // Assert
-        Assert.Equal((int)ExitCode.AggregateException, Environment.ExitCode);
     }
 }
