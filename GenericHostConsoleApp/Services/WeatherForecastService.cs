@@ -26,7 +26,7 @@ public class WeatherForecastService(
 
         var url = $"{options.Value.Url}?q={options.Value.City}&appid={options.Value.ApiKey}";
 
-        logger.LogInformation("OpenWeather Url: {url}", url);
+        logger.LogInformation("OpenWeather Url: {Url}", url);
 
         var policyWrap = GetPolicy();
 
@@ -52,22 +52,22 @@ public class WeatherForecastService(
                 retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
                 (exception, retryCount, context) =>
                 {
-                    logger.LogWarning($"Retry {retryCount} for policy: {context.PolicyKey}, due to: {exception}.");
+                    // ReSharper disable once ExceptionPassedAsTemplateArgumentProblem
+                    logger.LogWarning("Retry {RetryCount} for policy: {ContextPolicyKey}, due to: {Exception}", retryCount, context.PolicyKey, exception);
                 });
 
         var circuitBreakerPolicy = Policy
             .Handle<HttpRequestException>()
             .CircuitBreakerAsync(5, TimeSpan.FromMinutes(1),
                 (exception, breakDelay) =>
-                    logger.LogWarning($"Circuit breaker opened due to: {exception}. Break for: {breakDelay}"),
+                    logger.LogWarning("Circuit breaker opened due to: {Exception}. Break for: {BreakDelay}", exception, breakDelay),
                 () => logger.LogInformation("Circuit breaker reset"));
 
         var timeoutPolicy = Policy.TimeoutAsync(30,
             TimeoutStrategy.Optimistic, // More appropriate for HttpClient
             (context, timeSpan, _) =>
             {
-                logger.LogWarning(
-                    $"Timeout from policy: {context.PolicyKey} after waiting {timeSpan.TotalSeconds} seconds.");
+                logger.LogWarning("Timeout from policy: {ContextPolicyKey} after waiting {TimeSpanTotalSeconds} seconds", context.PolicyKey, timeSpan.TotalSeconds);
 
                 return Task.CompletedTask;
             });
