@@ -31,13 +31,22 @@ await Host.CreateDefaultBuilder(args)
         services
             .AddHostedService<ApplicationHostedService>()
             .AddTransient<IMainService, MainService>()
-            .AddSingleton<IWeatherService, WeatherService>()
-            .AddSingleton<IUserNotificationService, UserNotificationService>();
+            .AddSingleton<IWeatherForecastService, WeatherForecastService>()
+            .AddHttpClient<WeatherForecastService>();
 
-        // Set additional actions to take when configuring the provided WeatherOptions type.
+        // Set up the application options.
+        services.Configure<WeatherForecastServiceOptions>(
+            hostContext.Configuration.GetSection("WeatherForecastServiceOptions"));
+
         services
             .AddOptions<WeatherOptions>()
             .Bind(hostContext.Configuration.GetSection(nameof(WeatherOptions)))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services
+            .AddOptions<WeatherForecastServiceOptions>()
+            .Bind(hostContext.Configuration.GetSection(nameof(WeatherForecastServiceOptions)))
             .ValidateDataAnnotations()
             .ValidateOnStart();
     })
@@ -45,5 +54,6 @@ await Host.CreateDefaultBuilder(args)
     .UseSerilog((context, configuration) =>
         configuration
             .ReadFrom.Configuration(context.Configuration))
+
     // Start the host instance as a console application.
     .RunConsoleAsync();

@@ -1,4 +1,7 @@
 using GenericHostConsoleApp.Services.Interfaces;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace GenericHostConsoleApp.Services;
 
@@ -11,20 +14,21 @@ namespace GenericHostConsoleApp.Services;
 /// </remarks>
 public sealed class MainService : IMainService
 {
-    private readonly IUserNotificationService _userNotificationService;
-
     // Service dependencies.
-    private readonly IWeatherService _weatherService;
+    private readonly ILogger<MainService> _logger;
+    private readonly IWeatherForecastService _weatherForecastService;
 
     /// <summary>
     ///     Initialises the <see cref="MainService" /> using the specified dependencies.
     /// </summary>
-    /// <param name="weatherService">The weather service.</param>
-    /// <param name="userNotificationService">The notification service.</param>
-    public MainService(IWeatherService weatherService, IUserNotificationService userNotificationService)
+    /// <param name="logger">The logger service.</param>
+    /// <param name="weatherForecastService">The weather forecast service.</param>
+    public MainService(
+        ILogger<MainService> logger,
+        IWeatherForecastService weatherForecastService)
     {
-        _weatherService = weatherService;
-        _userNotificationService = userNotificationService;
+        _logger = logger;
+        _weatherForecastService = weatherForecastService;
     }
 
     /// <summary>
@@ -38,16 +42,11 @@ public sealed class MainService : IMainService
     /// <returns>The application exit code.</returns>
     public async Task<ExitCode> Main(string[] args, CancellationToken cancellationToken)
     {
-        var temperatures = await _weatherService.GetFiveDayTemperaturesAsync(cancellationToken)
-            .ConfigureAwait(false);
+        var forecast = await _weatherForecastService.FetchWeatherForecastAsync(cancellationToken);
 
-        for (var i = 0; i < temperatures.Count; i++)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
+        var formattedForecast = JToken.Parse(forecast).ToString(Formatting.Indented);
 
-            await _userNotificationService.NotifyDailyWeatherAsync(DateTime.Today.AddDays(i).DayOfWeek,
-                temperatures[i]).ConfigureAwait(false);
-        }
+        _logger.LogInformation($"Weather Forecast:\n: {formattedForecast}");
 
         return ExitCode.Success;
     }

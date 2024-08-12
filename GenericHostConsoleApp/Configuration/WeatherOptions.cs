@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using GenericHostConsoleApp.Services;
 
 namespace GenericHostConsoleApp.Configuration;
 
