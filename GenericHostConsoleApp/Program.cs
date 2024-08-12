@@ -39,12 +39,6 @@ await Host.CreateDefaultBuilder(args)
             hostContext.Configuration.GetSection("WeatherForecastServiceOptions"));
 
         services
-            .AddOptions<WeatherOptions>()
-            .Bind(hostContext.Configuration.GetSection(nameof(WeatherOptions)))
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
-        services
             .AddOptions<WeatherForecastServiceOptions>()
             .Bind(hostContext.Configuration.GetSection(nameof(WeatherForecastServiceOptions)))
             .ValidateDataAnnotations()
