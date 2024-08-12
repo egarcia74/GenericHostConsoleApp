@@ -150,20 +150,9 @@ public sealed class ApplicationHostedService : IHostedService
         switch (ex)
         {
             case TaskCanceledException:
+            case OperationCanceledException:
                 _logger.LogApplicationCancelled();
                 return ExitCode.Cancelled;
-
-            case ArgumentNullException argumentNullException:
-                _logger.LogArgumentNullException(argumentNullException);
-                return ExitCode.ArgumentNullException;
-
-            case ArgumentException argumentException:
-                _logger.LogArgumentException(argumentException);
-                return ExitCode.ArgumentException;
-
-            case InvalidOperationException invalidOperationException:
-                _logger.LogInvalidOperationException(invalidOperationException);
-                return ExitCode.InvalidOperationException;
 
             case AggregateException aggregateException:
                 aggregateException.Handle(exception =>
