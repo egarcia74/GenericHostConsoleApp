@@ -31,7 +31,7 @@ await Host.CreateDefaultBuilder(args)
         services
             .AddHostedService<ApplicationHostedService>()
             .AddTransient<IMainService, MainService>()
-            .AddSingleton<IWeatherForecastService, WeatherForecastService>()
+            .AddTransient<IWeatherForecastService, WeatherForecastService>()
             .AddHttpClient<WeatherForecastService>();
 
         // Set up the application options.
