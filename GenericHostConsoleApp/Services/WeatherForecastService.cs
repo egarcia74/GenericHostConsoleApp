@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using GenericHostConsoleApp.Configuration;
+using GenericHostConsoleApp.Exceptions;
 using GenericHostConsoleApp.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

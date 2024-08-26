@@ -1,4 +1,4 @@
-namespace GenericHostConsoleApp.Services;
+namespace GenericHostConsoleApp.Exceptions;
 
 /// <summary>
 ///     Represents an exception that occurs during weather forecast retrieval.
