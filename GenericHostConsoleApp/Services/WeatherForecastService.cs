@@ -2,6 +2,7 @@ using System.Diagnostics;
 using GenericHostConsoleApp.Configuration;
 using GenericHostConsoleApp.Exceptions;
 using GenericHostConsoleApp.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
@@ -12,6 +13,7 @@ namespace GenericHostConsoleApp.Services;
 
 /// Represents a service for fetching weather forecasts.
 public class WeatherForecastService(
+    IConfiguration config,
     HttpClient httpClient,
     IOptions<WeatherForecastServiceOptions> options,
     ILogger<WeatherForecastService> logger)
@@ -26,7 +28,7 @@ public class WeatherForecastService(
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var url = $"{options.Value.Url}?q={options.Value.City}&appid={options.Value.ApiKey}";
+        var url = $"{options.Value.Url}?q={config["City"]}&appid={options.Value.ApiKey}";
 
         // Log the URL but obfuscate the key for security
         Debug.Assert(options.Value.ApiKey != null, "options.Value.ApiKey != null");

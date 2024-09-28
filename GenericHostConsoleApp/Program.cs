@@ -18,12 +18,10 @@ await Host.CreateDefaultBuilder(args)
         builder.AddUserSecrets<Program>(false, true);
 
         // Uncomment below code to add a command line configuration provider:
-        // builder.AddCommandLine(args, new Dictionary<string, string>
-        // {
-        //     // Define parameter mappings.
-        //     { "-a1", "arg1" },
-        //     { "-a2", "arg2" }
-        // });
+        builder.AddCommandLine(args, new Dictionary<string, string>
+        {
+            { "-c", "City" }
+        });
     })
     .ConfigureServices((hostContext, services) =>
     {
