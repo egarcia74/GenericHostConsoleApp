@@ -1,7 +1,6 @@
+using System.Text.Json;
 using GenericHostConsoleApp.Services.Interfaces;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace GenericHostConsoleApp.Services;
 
@@ -42,12 +41,19 @@ public sealed class MainService : IMainService
     /// <returns>The application exit code.</returns>
     public async Task<ExitCode> Main(string[] args, CancellationToken cancellationToken)
     {
-        var forecast = await _weatherForecastService.FetchWeatherForecastAsync(cancellationToken);
+        var forecastJson = await _weatherForecastService.FetchWeatherForecastAsync(cancellationToken);
 
-        var formattedForecast = JToken.Parse(forecast).ToString(Formatting.Indented);
+        // var formattedForecast = JToken.Parse(forecast).ToString(Formatting.Indented);
 
+        using var root = JsonDocument.Parse(forecastJson);
+        var weather = root.RootElement.GetProperty("weather").EnumerateArray().First();
+
+        var main = weather.GetProperty("main").GetString();
+        var description = weather.GetProperty("description").GetString();
+        var city = root.RootElement.GetProperty("name").GetString();
+        
         // ReSharper disable once TemplateIsNotCompileTimeConstantProblem
-        _logger.LogInformation($"Weather Forecast:\n: {formattedForecast}");
+        _logger.LogInformation($"Weather Forecast for {city}: {main} - {description}");
 
         return ExitCode.Success;
     }
