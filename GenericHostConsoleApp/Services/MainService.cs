@@ -43,18 +43,27 @@ public sealed class MainService : IMainService
     {
         var forecastJson = await _weatherForecastService.FetchWeatherForecastAsync(cancellationToken);
 
-        // var formattedForecast = JToken.Parse(forecast).ToString(Formatting.Indented);
-
         using var root = JsonDocument.Parse(forecastJson);
         var weather = root.RootElement.GetProperty("weather").EnumerateArray().First();
-
-        var main = weather.GetProperty("main").GetString();
-        var description = weather.GetProperty("description").GetString();
+        var main = root.RootElement.GetProperty("main");
+        var temp= KelvinToCelsius(main.GetProperty("temp").GetDouble());
         var city = root.RootElement.GetProperty("name").GetString();
+        var weatherMain = weather.GetProperty("main").GetString();
+        var weatherDescription = weather.GetProperty("description").GetString();
         
         // ReSharper disable once TemplateIsNotCompileTimeConstantProblem
-        _logger.LogInformation($"Weather Forecast for {city}: {main} - {description}");
+        _logger.LogInformation($"Weather Forecast for {city}: {temp:0} Cº - {weatherMain} - {weatherDescription}");
 
         return ExitCode.Success;
+    }
+    
+    /// <summary>
+    /// Converts Kelvin to Celsius.
+    /// </summary>
+    /// <param name="kelvin">The temperature in Kelvin.</param>
+    /// <returns>The Celcius temperature.</returns>
+    static double KelvinToCelsius(double kelvin)
+    {
+        return kelvin - 273.15;
     }
 }
