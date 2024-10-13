@@ -2,7 +2,6 @@ using System.Diagnostics;
 using GenericHostConsoleApp.Configuration;
 using GenericHostConsoleApp.Exceptions;
 using GenericHostConsoleApp.Services.Interfaces;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
@@ -13,7 +12,6 @@ namespace GenericHostConsoleApp.Services;
 
 /// Represents a service for fetching weather forecasts.
 public class WeatherForecastService(
-    IConfiguration config,
     HttpClient httpClient,
     IOptions<WeatherForecastServiceOptions> options,
     ILogger<WeatherForecastService> logger)
@@ -22,13 +20,14 @@ public class WeatherForecastService(
     /// <summary>
     ///     Fetches the weather forecast asynchronously.
     /// </summary>
+    /// <param name="city">The city to get the forecast for.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The weather forecast as a string.</returns>
-    public async Task<string> FetchWeatherForecastAsync(CancellationToken cancellationToken)
+    public async Task<string> FetchWeatherForecastAsync(string city, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var url = $"{options.Value.Url}?q={config["City"]}&appid={options.Value.ApiKey}";
+        var url = $"{options.Value.Url}?q={city}&appid={options.Value.ApiKey}";
 
         // Log the URL but obfuscate the key for security
         Debug.Assert(options.Value.ApiKey != null, "options.Value.ApiKey != null");
