@@ -53,14 +53,13 @@ public sealed class MainService : IMainService
                 cancellationToken);
 
         using var root = JsonDocument.Parse(forecastJson);
-        var weather = root.RootElement.GetProperty("weather").EnumerateArray().First();
         var main = root.RootElement.GetProperty("main");
         var temp = KelvinToCelsius(main.GetProperty("temp").GetDouble());
+        var weather = root.RootElement.GetProperty("weather").EnumerateArray().First();
         var weatherMain = weather.GetProperty("main").GetString();
         var weatherDescription = weather.GetProperty("description").GetString();
 
-        // ReSharper disable once TemplateIsNotCompileTimeConstantProblem
-        _logger.LogInformation($"Weather Forecast for {city}: {temp:0} Cº - {weatherMain} - {weatherDescription}");
+        _logger.LogInformation("Weather Forecast for {city}: {temp:0} Cº - {weatherMain} - {weatherDescription}", city, temp, weatherMain, weatherDescription);
 
         return ExitCode.Success;
     }
