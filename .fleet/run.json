@@ -1,0 +1,13 @@
+{
+    "configurations": [
+        {
+            "name": "Run 'GenericHostConsoleApp' (Paris)",            
+            "type": "dotnet",
+            "workingDir": "$PROJECT_DIR$/GenericHostConsoleApp/bin/Debug/net8.0",
+            "allowParallelRun": true,
+            "solutionPath": "$PROJECT_DIR$/GenericHostConsoleApp.sln",
+            "projectPath": "$PROJECT_DIR$/GenericHostConsoleApp/GenericHostConsoleApp.csproj",
+            "args": ["-c", "Paris"]
+        }
+    ]
+}
