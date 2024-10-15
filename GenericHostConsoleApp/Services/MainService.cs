@@ -59,7 +59,7 @@ public sealed class MainService : IMainService
         var weatherMain = weather.GetProperty("main").GetString();
         var weatherDescription = weather.GetProperty("description").GetString();
 
-        _logger.LogInformation("Weather Forecast for {city}: {temp:0}ºC - {weatherMain} - {weatherDescription}", city, temp, weatherMain, weatherDescription);
+        _logger.LogInformation($"Weather Forecast for {city}: {temp:0}ºC - {weatherMain} - {weatherDescription}");
 
         return ExitCode.Success;
     }
