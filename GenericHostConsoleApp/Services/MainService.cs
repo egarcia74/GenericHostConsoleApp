@@ -69,7 +69,7 @@ public sealed class MainService : IMainService
     ///     Converts Kelvin to Celsius.
     /// </summary>
     /// <param name="kelvin">The temperature in Kelvin.</param>
-    /// <returns>The Celcius temperature.</returns>
+    /// <returns>The Celsius temperature.</returns>
     private static double KelvinToCelsius(double kelvin)
     {
         return kelvin - 273.15;
