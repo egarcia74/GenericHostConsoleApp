@@ -87,7 +87,7 @@ public sealed class ApplicationHostedService : IHostedService
             // If the main service is still running or the passed in cancellation token is in the cancelled state
             // then request a cancellation.
             if (!_mainTask.IsCompleted || cancellationToken.IsCancellationRequested)
-                _cancellationTokenSource?
+                await _cancellationTokenSource!
                     .CancelAsync()
                     .ConfigureAwait(false);
 
