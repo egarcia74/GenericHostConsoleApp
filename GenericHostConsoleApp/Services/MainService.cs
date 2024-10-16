@@ -43,14 +43,14 @@ public sealed class MainService : IMainService
     /// </remarks>
     /// <param name="args">The command line arguments.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
+    /// <exception cref="ArgumentNullException"></exception>
     /// <returns>The application exit code.</returns>
     public async Task<ExitCode> Main(string[] args, CancellationToken cancellationToken)
     {
-        var city = _configuration.GetValue<string>("City");
+        var city = _configuration.GetValue<string>("City") ??
+                   throw new InvalidOperationException("City not specified.");
 
-        var forecastJson =
-            await _weatherForecastService.FetchWeatherForecastAsync(city ?? throw new InvalidOperationException(),
-                cancellationToken);
+        var forecastJson = await _weatherForecastService.FetchWeatherForecastAsync(city, cancellationToken);
 
         using var root = JsonDocument.Parse(forecastJson);
         var main = root.RootElement.GetProperty("main");
