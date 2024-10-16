@@ -12,6 +12,18 @@ namespace GenericHostConsoleApp.Services;
 /// </summary>
 public sealed class ApplicationHostedService : IHostedService
 {
+    /// <summary>
+    /// Represents the various lifetime events of an application's lifecycle.
+    /// These events are triggered at different points during the application's lifetime,
+    /// such as when the application starts, stops, or is in the process of stopping.
+    /// </summary>
+    private enum ApplicationLifetimeEvent
+    {
+        ApplicationStarted,
+        ApplicationStopping,
+        ApplicationStopped
+    }
+
     // Service dependencies.
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
     private readonly ILogger<ApplicationHostedService> _logger;
@@ -22,13 +34,6 @@ public sealed class ApplicationHostedService : IHostedService
 
     // Task that executes the main service.
     private Task<ExitCode>? _mainTask;
-    
-    public enum ApplicationLifetimeEvent
-    {
-        ApplicationStarted,
-        ApplicationStopping,
-        ApplicationStopped
-    }
 
     /// <summary>
     ///     Initialises the <see cref="ApplicationHostedService" /> using the specified dependencies.
@@ -76,12 +81,12 @@ public sealed class ApplicationHostedService : IHostedService
         }, ApplicationLifetimeEvent.ApplicationStarted);
 
         RegisterEventHandler(
-            _hostApplicationLifetime, 
-            _logger.LogApplicationStopping, 
+            _hostApplicationLifetime,
+            _logger.LogApplicationStopping,
             ApplicationLifetimeEvent.ApplicationStopping);
-        
+
         RegisterEventHandler(
-            _hostApplicationLifetime, 
+            _hostApplicationLifetime,
             _logger.LogApplicationStopped,
             ApplicationLifetimeEvent.ApplicationStopped);
 
@@ -188,11 +193,11 @@ public sealed class ApplicationHostedService : IHostedService
     /// <param name="hostApplicationLifetime">The <see cref="IHostApplicationLifetime" /> instance.</param>
     /// <param name="action">The action to be executed when the event is triggered.</param>
     /// <param name="lifetimeEvent">
-    /// The name of the application lifetime event ("ApplicationStarted", "ApplicationStopping", or
+    ///     The name of the application lifetime event ("ApplicationStarted", "ApplicationStopping", or
     ///     "ApplicationStopped").
     /// </param>
     private static void RegisterEventHandler(
-        IHostApplicationLifetime hostApplicationLifetime, 
+        IHostApplicationLifetime hostApplicationLifetime,
         Action action,
         ApplicationLifetimeEvent lifetimeEvent)
     {
