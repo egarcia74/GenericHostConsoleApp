@@ -22,6 +22,13 @@ public sealed class ApplicationHostedService : IHostedService
 
     // Task that executes the main service.
     private Task<ExitCode>? _mainTask;
+    
+    public enum ApplicationLifetimeEvent
+    {
+        ApplicationStarted,
+        ApplicationStopping,
+        ApplicationStopped
+    }
 
     /// <summary>
     ///     Initialises the <see cref="ApplicationHostedService" /> using the specified dependencies.
@@ -66,10 +73,17 @@ public sealed class ApplicationHostedService : IHostedService
 
             // Execute the main service but do not await it here. The task will be awaited in StopAsync().
             _mainTask = ExecuteMainAsync(args, _cancellationTokenSource.Token);
-        }, "ApplicationStarted");
+        }, ApplicationLifetimeEvent.ApplicationStarted);
 
-        RegisterEventHandler(_hostApplicationLifetime, _logger.LogApplicationStopping, "ApplicationStopping");
-        RegisterEventHandler(_hostApplicationLifetime, _logger.LogApplicationStopped, "ApplicationStopped");
+        RegisterEventHandler(
+            _hostApplicationLifetime, 
+            _logger.LogApplicationStopping, 
+            ApplicationLifetimeEvent.ApplicationStopping);
+        
+        RegisterEventHandler(
+            _hostApplicationLifetime, 
+            _logger.LogApplicationStopped,
+            ApplicationLifetimeEvent.ApplicationStopped);
 
         return Task.CompletedTask;
     }
@@ -173,24 +187,32 @@ public sealed class ApplicationHostedService : IHostedService
     /// </summary>
     /// <param name="hostApplicationLifetime">The <see cref="IHostApplicationLifetime" /> instance.</param>
     /// <param name="action">The action to be executed when the event is triggered.</param>
-    /// <param name="eventName">
-    ///     The name of the application lifetime event ("ApplicationStarted", "ApplicationStopping", or
+    /// <param name="lifetimeEvent">
+    /// The name of the application lifetime event ("ApplicationStarted", "ApplicationStopping", or
     ///     "ApplicationStopped").
     /// </param>
-    private static void RegisterEventHandler(IHostApplicationLifetime hostApplicationLifetime, Action action,
-        string eventName)
+    private static void RegisterEventHandler(
+        IHostApplicationLifetime hostApplicationLifetime, 
+        Action action,
+        ApplicationLifetimeEvent lifetimeEvent)
     {
-        switch (eventName)
+        ArgumentNullException.ThrowIfNull(hostApplicationLifetime);
+
+        ArgumentNullException.ThrowIfNull(action);
+
+        switch (lifetimeEvent)
         {
-            case "ApplicationStarted":
+            case ApplicationLifetimeEvent.ApplicationStarted:
                 hostApplicationLifetime.ApplicationStarted.Register(action);
                 break;
-            case "ApplicationStopping":
+            case ApplicationLifetimeEvent.ApplicationStopping:
                 hostApplicationLifetime.ApplicationStopping.Register(action);
                 break;
-            case "ApplicationStopped":
+            case ApplicationLifetimeEvent.ApplicationStopped:
                 hostApplicationLifetime.ApplicationStopped.Register(action);
                 break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(lifetimeEvent), lifetimeEvent, "Unknown event name.");
         }
     }
 }
