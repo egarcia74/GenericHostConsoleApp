@@ -10,7 +10,7 @@ namespace GenericHostConsoleApp.Services;
 ///     A hosted service is a service that runs long-running background tasks, which typically run over the lifetime of
 ///     your application.
 /// </summary>
-public sealed class ApplicationHostedService : IHostedService
+public sealed class ApplicationHostedService : IHostedService, IDisposable
 {
     /// <summary>
     /// Represents the various lifetime events of an application's lifecycle.
@@ -219,5 +219,19 @@ public sealed class ApplicationHostedService : IHostedService
             default:
                 throw new ArgumentOutOfRangeException(nameof(lifetimeEvent), lifetimeEvent, "Unknown event name.");
         }
+    }
+    
+    /// <summary>
+    /// Disposes the resources.
+    /// </summary>
+    public void Dispose()
+    {
+        _cancellationTokenSource?.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
+    ~ApplicationHostedService()
+    {
+        Dispose();
     }
 }
