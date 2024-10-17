@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GenericHostConsoleApp.Services;
 
+// MainService.cs
 public sealed class MainService(
     IConfiguration configuration,
     ILogger<MainService> logger,
@@ -13,7 +14,8 @@ public sealed class MainService(
     private readonly IConfiguration _configuration =
         configuration ?? throw new ArgumentNullException(nameof(configuration));
 
-    private readonly ILogger<MainService> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly ILogger<MainService> _logger =
+        logger ?? throw new ArgumentNullException(nameof(logger));
 
     private readonly IWeatherForecastService _weatherForecastService =
         weatherForecastService ?? throw new ArgumentNullException(nameof(weatherForecastService));
@@ -31,18 +33,26 @@ public sealed class MainService(
             var city = _configuration.GetValue<string>("City") ??
                        throw new InvalidOperationException("City not specified.");
 
-            var forecastJson = await _weatherForecastService.FetchWeatherForecastAsync(city, cancellationToken)
+            var forecastJson = await _weatherForecastService
+                .FetchWeatherForecastAsync(city, cancellationToken)
                 .ConfigureAwait(false);
 
             return ProcessWeatherForecast(forecastJson, city);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is ArgumentException || ex is InvalidOperationException ||
+                                   ex is JsonException)
         {
             _logger.LogError(ex, "An exception occurred during the main execution.");
             return ExitCode.UnhandledException;
         }
     }
 
+    /// <summary>
+    /// Processes the weather forecast JSON for a specified city.
+    /// </summary>
+    /// <param name="forecastJson">The JSON string containing the weather forecast data.</param>
+    /// <param name="city">The name of the city for which the weather forecast is processed.</param>
+    /// <returns>The exit code representing the outcome of the weather forecast processing.</returns>
     private ExitCode ProcessWeatherForecast(string forecastJson, string city)
     {
         try
