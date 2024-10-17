@@ -60,7 +60,9 @@ public sealed class MainService : IMainService
         var weatherDescription = weather.GetProperty("description").GetString();
 
         // ReSharper disable once TemplateIsNotCompileTimeConstantProblem
+#pragma warning disable CA2254
         _logger.LogInformation($"Weather Forecast for {city}: {temp:0}ºC - {weatherMain} - {weatherDescription}");
+#pragma warning restore CA2254
 
         return ExitCode.Success;
     }
