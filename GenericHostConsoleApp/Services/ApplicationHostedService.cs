@@ -12,18 +12,6 @@ namespace GenericHostConsoleApp.Services;
 /// </summary>
 public sealed class ApplicationHostedService : IHostedService, IDisposable
 {
-    /// <summary>
-    /// Represents the various lifetime events of an application's lifecycle.
-    /// These events are triggered at different points during the application's lifetime,
-    /// such as when the application starts, stops, or is in the process of stopping.
-    /// </summary>
-    private enum ApplicationLifetimeEvent
-    {
-        ApplicationStarted,
-        ApplicationStopping,
-        ApplicationStopped
-    }
-
     // Service dependencies.
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
     private readonly ILogger<ApplicationHostedService> _logger;
@@ -49,6 +37,15 @@ public sealed class ApplicationHostedService : IHostedService, IDisposable
         _hostApplicationLifetime = hostApplicationLifetime;
         _logger = logger;
         _mainService = mainService;
+    }
+
+    /// <summary>
+    ///     Disposes the resources.
+    /// </summary>
+    public void Dispose()
+    {
+        _cancellationTokenSource?.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
@@ -219,15 +216,6 @@ public sealed class ApplicationHostedService : IHostedService, IDisposable
             default:
                 throw new ArgumentOutOfRangeException(nameof(lifetimeEvent), lifetimeEvent, "Unknown event name.");
         }
-    }
-    
-    /// <summary>
-    /// Disposes the resources.
-    /// </summary>
-    public void Dispose()
-    {
-        _cancellationTokenSource?.Dispose();
-        GC.SuppressFinalize(this);
     }
 
     ~ApplicationHostedService()
