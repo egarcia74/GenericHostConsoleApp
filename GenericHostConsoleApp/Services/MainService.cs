@@ -5,13 +5,6 @@ using Microsoft.Extensions.Logging;
 
 namespace GenericHostConsoleApp.Services;
 
-/// <summary>
-///     Main application service.
-/// </summary>
-/// <remarks>
-///     This service implements the main application logic.
-///     The method <see cref="Main" /> is executed once when the application executes.
-/// </remarks>
 public sealed class MainService(
     IConfiguration configuration,
     ILogger<MainService> logger,
@@ -26,21 +19,28 @@ public sealed class MainService(
         weatherForecastService ?? throw new ArgumentNullException(nameof(weatherForecastService));
 
     /// <summary>
-    /// Executes the main application logic.
+    ///     Executes the main application logic.
     /// </summary>
     /// <param name="args">The command-line arguments.</param>
     /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
     /// <returns>The exit code representing the outcome of the application execution.</returns>
     public async Task<ExitCode> Main(string[] args, CancellationToken cancellationToken)
     {
-        var city = _configuration.GetValue<string>("City")
-                   ?? throw new InvalidOperationException("City not specified.");
+        try
+        {
+            var city = _configuration.GetValue<string>("City") ??
+                       throw new InvalidOperationException("City not specified.");
 
-        var forecastJson = await _weatherForecastService
-            .FetchWeatherForecastAsync(city, cancellationToken)
-            .ConfigureAwait(false);
+            var forecastJson = await _weatherForecastService.FetchWeatherForecastAsync(city, cancellationToken)
+                .ConfigureAwait(false);
 
-        return ProcessWeatherForecast(forecastJson, city);
+            return ProcessWeatherForecast(forecastJson, city);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An exception occurred during the main execution.");
+            return ExitCode.UnhandledException;
+        }
     }
 
     private ExitCode ProcessWeatherForecast(string forecastJson, string city)
@@ -64,10 +64,12 @@ public sealed class MainService(
             }
 
             var temp = KelvinToCelsius(tempElement.GetDouble());
+
             if (!root.RootElement.TryGetProperty("weather", out var weatherArray) ||
                 weatherArray.ValueKind != JsonValueKind.Array || !weatherArray.EnumerateArray().Any())
             {
-                _logger.LogError("The JSON does not contain 'weather' property or it is empty. JSON: {ForecastJson}",
+                _logger.LogError(
+                    "The JSON does not contain 'weather' property or it is empty. JSON: {ForecastJson}",
                     forecastJson);
                 return ExitCode.UnhandledException;
             }
@@ -75,6 +77,7 @@ public sealed class MainService(
             var weather = weatherArray.EnumerateArray().First();
             var weatherMain = weather.GetProperty("main").GetString();
             var weatherDescription = weather.GetProperty("description").GetString();
+
             if (string.IsNullOrEmpty(weatherMain) || string.IsNullOrEmpty(weatherDescription))
             {
                 _logger.LogError(
@@ -84,8 +87,8 @@ public sealed class MainService(
             }
 
             _logger.LogInformation(
-                "Weather Forecast for {City}: {Temperature:0}ºC - {WeatherMain} - {WeatherDescription}",
-                city, temp, weatherMain, weatherDescription);
+                "Weather Forecast for {City}: {Temperature:0}ºC - {WeatherMain} - {WeatherDescription}", city, temp,
+                weatherMain, weatherDescription);
             return ExitCode.Success;
         }
         catch (JsonException ex)
@@ -96,7 +99,7 @@ public sealed class MainService(
     }
 
     /// <summary>
-    /// Converts a temperature from Kelvin to Celsius.
+    ///     Converts a temperature from Kelvin to Celsius.
     /// </summary>
     /// <param name="kelvin">The temperature in Kelvin.</param>
     /// <returns>The temperature in Celsius.</returns>
