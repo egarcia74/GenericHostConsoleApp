@@ -53,16 +53,34 @@ public sealed class MainService : IMainService
         var forecastJson = await _weatherForecastService.FetchWeatherForecastAsync(city, cancellationToken);
 
         using var root = JsonDocument.Parse(forecastJson);
-        var main = root.RootElement.GetProperty("main");
-        var temp = KelvinToCelsius(main.GetProperty("temp").GetDouble());
-        var weather = root.RootElement.GetProperty("weather").EnumerateArray().First();
+
+        if (!root.RootElement.TryGetProperty("main", out var main))
+        {
+            _logger.LogError("The JSON does not contain 'main' property.");
+            return ExitCode.UnhandledException;
+        }
+
+        if (!main.TryGetProperty("temp", out var tempElement))
+        {
+            _logger.LogError("The JSON does not contain 'temp' property.");
+            return ExitCode.UnhandledException;
+        }
+
+        var temp = KelvinToCelsius(tempElement.GetDouble());
+
+        if (!root.RootElement.TryGetProperty("weather", out var weatherArray) ||
+            weatherArray.ValueKind != JsonValueKind.Array || !weatherArray.EnumerateArray().Any())
+        {
+            _logger.LogError("The JSON does not contain 'weather' property or it is empty.");
+            return ExitCode.UnhandledException;
+        }
+
+        var weather = weatherArray.EnumerateArray().First();
         var weatherMain = weather.GetProperty("main").GetString();
         var weatherDescription = weather.GetProperty("description").GetString();
 
-        // ReSharper disable once TemplateIsNotCompileTimeConstantProblem
-#pragma warning disable CA2254
-        _logger.LogInformation($"Weather Forecast for {city}: {temp:0}ºC - {weatherMain} - {weatherDescription}");
-#pragma warning restore CA2254
+        _logger.LogInformation("Weather Forecast for {City}: {Temperature:0}ºC - {WeatherMain} - {WeatherDescription}",
+            city, temp, weatherMain, weatherDescription);
 
         return ExitCode.Success;
     }
