@@ -44,8 +44,8 @@ public sealed class ApplicationHostedService : IHostedService, IDisposable
     /// </summary>
     public void Dispose()
     {
+        _cancellationTokenSource?.Cancel();
         _cancellationTokenSource?.Dispose();
-        GC.SuppressFinalize(this);
     }
 
     /// <summary>
@@ -61,7 +61,11 @@ public sealed class ApplicationHostedService : IHostedService, IDisposable
         _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
         // Bail if the start process has been aborted.
-        if (_cancellationTokenSource.IsCancellationRequested) return Task.CompletedTask;
+        if (_cancellationTokenSource.IsCancellationRequested)
+        {
+            _logger.LogWarning("StartAsync was aborted due to cancellation");
+            return Task.CompletedTask;
+        }
 
         //
         // Register callbacks to handle the application lifetime events.
@@ -216,10 +220,5 @@ public sealed class ApplicationHostedService : IHostedService, IDisposable
             default:
                 throw new ArgumentOutOfRangeException(nameof(lifetimeEvent), lifetimeEvent, "Unknown event name.");
         }
-    }
-
-    ~ApplicationHostedService()
-    {
-        Dispose();
     }
 }
