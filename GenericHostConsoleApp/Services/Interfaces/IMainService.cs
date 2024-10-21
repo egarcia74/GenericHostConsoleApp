@@ -11,5 +11,5 @@ public interface IMainService
     /// <param name="args">An array of command-line arguments passed to the application.</param>
     /// <param name="cancellationToken">A token that can be used to signal the operation should be canceled.</param>
     /// <returns>Returns an <see cref="ExitCode" /> indicating the result of the execution.</returns>
-    Task<ExitCode> MainAsync(string[] args, CancellationToken cancellationToken);
+    Task<ExitCode> ExecuteMainAsync(string[] args, CancellationToken cancellationToken);
 }

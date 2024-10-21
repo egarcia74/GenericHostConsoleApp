@@ -28,38 +28,52 @@ public sealed class MainService(
     /// <param name="args">An array of command-line arguments passed to the application.</param>
     /// <param name="cancellationToken">A token that can be used to signal the operation should be canceled.</param>
     /// <returns>Returns an <see cref="ExitCode" /> indicating the result of the execution.</returns>
-    public async Task<ExitCode> MainAsync(string[] args, CancellationToken cancellationToken) // Renamed to MainAsync
+    public async Task<ExitCode> ExecuteMainAsync(string[] args, CancellationToken cancellationToken)
     {
         try
         {
             var city = GetCityFromConfiguration();
-
             var forecastJson = await weatherForecastService
                 .FetchWeatherForecastAsync(city, cancellationToken)
                 .ConfigureAwait(false);
-
             return ProcessWeatherForecast(forecastJson);
         }
-        catch (ArgumentException ex)
+        catch (Exception ex) when (LogException(ex, out var result))
         {
-            logger.LogError(ex, "An argument exception occurred during the main execution");
-            return ExitCode.InvalidArgument;
+            return result;
         }
-        catch (InvalidOperationException ex)
+    }
+
+    /// <summary>
+    ///     Logs the exception and returns proper exit code.
+    /// </summary>
+    /// <param name="ex">Exception occurred during the execution.</param>
+    /// <param name="exitCode">Exit code indicating the result of the execution.</param>
+    /// <returns>Returns true to indicate a valid exit code for the caller.</returns>
+    private bool LogException(Exception ex, out ExitCode exitCode)
+    {
+        switch (ex)
         {
-            logger.LogError(ex, "An invalid operation exception occurred during the main execution");
-            return ExitCode.InvalidOperation;
+            case ArgumentException argumentException:
+                logger.LogError(argumentException, "An argument exception occurred during the main execution");
+                exitCode = ExitCode.InvalidArgument;
+                break;
+            case InvalidOperationException invalidOperationException:
+                logger.LogError(invalidOperationException,
+                    "An invalid operation exception occurred during the main execution");
+                exitCode = ExitCode.InvalidOperation;
+                break;
+            case JsonException jsonException:
+                logger.LogError(jsonException, "A JSON exception occurred during the main execution");
+                exitCode = ExitCode.InvalidJson;
+                break;
+            default:
+                logger.LogError(ex, "An unexpected exception occurred during the main execution");
+                exitCode = ExitCode.UnhandledException;
+                break;
         }
-        catch (JsonException ex)
-        {
-            logger.LogError(ex, "A JSON exception occurred during the main execution");
-            return ExitCode.InvalidJson;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An unexpected exception occurred during the main execution");
-            return ExitCode.UnhandledException;
-        }
+
+        return true;
     }
 
     /// <summary>
@@ -78,7 +92,6 @@ public sealed class MainService(
         var city = configuration.GetValue<string>(CityConfigKey);
         if (string.IsNullOrEmpty(city))
             throw new InvalidOperationException($"Configuration key '{CityConfigKey}' not specified.");
-
         return city;
     }
 
@@ -93,16 +106,13 @@ public sealed class MainService(
         {
             var weatherResponse = JsonSerializer.Deserialize<WeatherResponse>(forecastJson);
             if (weatherResponse == null) throw new JsonException("Failed to deserialize weather forecast.");
-
             var temperature = KelvinToCelsius(weatherResponse.Main!.Temp);
-
             logger.LogInformation(
                 "Weather Forecast for {City}: {Temperature:0}ºC - {WeatherMain} - {WeatherDescription}",
                 weatherResponse.Name,
                 temperature,
                 weatherResponse.Weather?.First().Main,
                 weatherResponse.Weather?.First().Description);
-
             return ExitCode.Success;
         }
         catch (JsonException ex)
