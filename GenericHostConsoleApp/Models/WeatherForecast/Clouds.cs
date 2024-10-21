@@ -1,10 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace GenericHostConsoleApp.Models.WeatherForecast
+namespace GenericHostConsoleApp.Models.WeatherForecast;
+
+public class Clouds
 {
-    public class Clouds
-    {
-        [JsonPropertyName("all")]
-        public int All { get; set; }
-    }
+    [JsonPropertyName("all")] public int All { get; set; }
 }

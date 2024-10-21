@@ -31,17 +31,17 @@ public enum ExitCode
     AggregateException,
 
     /// <summary>
-    /// Indicates that an invalid argument was provided.
+    ///     Indicates that an invalid argument was provided.
     /// </summary>
     InvalidArgument,
 
     /// <summary>
-    /// Indicates that an invalid operation or action was attempted.
+    ///     Indicates that an invalid operation or action was attempted.
     /// </summary>
     InvalidOperation,
 
     /// <summary>
-    /// Indicates that the application encountered invalid JSON data.
+    ///     Indicates that the application encountered invalid JSON data.
     /// </summary>
     InvalidJson
 }

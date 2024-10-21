@@ -10,7 +10,9 @@ using Polly.Wrap;
 
 namespace GenericHostConsoleApp.Services;
 
-/// Represents a service for fetching weather forecasts.
+/// <summary>
+///     A service for fetching weather forecasts from an external API.
+/// </summary>
 public class WeatherForecastService(
     HttpClient httpClient,
     IOptions<WeatherForecastServiceOptions> options,
