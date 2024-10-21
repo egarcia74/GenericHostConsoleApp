@@ -2,9 +2,10 @@ using System.Text.Json.Serialization;
 
 namespace GenericHostConsoleApp.Models.WeatherForecast;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public class Coordinates
 {
-    [JsonPropertyName("lon")] public double Lon { get; set; }
+    [JsonPropertyName("lon")] public double Lon { get; init; }
 
-    [JsonPropertyName("lat")] public double Lat { get; set; }
+    [JsonPropertyName("lat")] public double Lat { get; init; }
 }

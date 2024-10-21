@@ -2,31 +2,33 @@ using System.Text.Json.Serialization;
 
 namespace GenericHostConsoleApp.Models.WeatherForecast;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public class WeatherResponse
 {
-    [JsonPropertyName("coord")] public Coordinates? Coord { get; set; }
+    [JsonPropertyName("coord")] public Coordinates? Coord { get; init; }
 
-    [JsonPropertyName("weather")] public List<Weather>? Weather { get; set; }
+    // ReSharper disable once CollectionNeverUpdated.Global
+    [JsonPropertyName("weather")] public List<Weather>? Weather { get; init; } = [];
 
-    [JsonPropertyName("base")] public string? Base { get; set; }
+    [JsonPropertyName("base")] public string? Base { get; init; }
 
-    [JsonPropertyName("main")] public Main? Main { get; set; }
+    [JsonPropertyName("main")] public Main? Main { get; init; }
 
-    [JsonPropertyName("visibility")] public int Visibility { get; set; }
+    [JsonPropertyName("visibility")] public int Visibility { get; init; }
 
-    [JsonPropertyName("wind")] public Wind? Wind { get; set; }
+    [JsonPropertyName("wind")] public Wind? Wind { get; init; }
 
-    [JsonPropertyName("clouds")] public Clouds? Clouds { get; set; }
+    [JsonPropertyName("clouds")] public Clouds? Clouds { get; init; }
 
-    [JsonPropertyName("dt")] public long Dt { get; set; }
+    [JsonPropertyName("dt")] public long Dt { get; init; }
 
-    [JsonPropertyName("sys")] public Sys? Sys { get; set; }
+    [JsonPropertyName("sys")] public Sys? Sys { get; init; }
 
-    [JsonPropertyName("timezone")] public int Timezone { get; set; }
+    [JsonPropertyName("timezone")] public int Timezone { get; init; }
 
-    [JsonPropertyName("id")] public int Id { get; set; }
+    [JsonPropertyName("id")] public int Id { get; init; }
 
-    [JsonPropertyName("name")] public string? Name { get; set; }
+    [JsonPropertyName("name")] public string? Name { get; init; }
 
-    [JsonPropertyName("cod")] public int Cod { get; set; }
+    [JsonPropertyName("cod")] public int Cod { get; init; }
 }

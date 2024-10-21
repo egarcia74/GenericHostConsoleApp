@@ -86,7 +86,6 @@ public sealed class MainService(
     ///     Processes the weather forecast data for a specified city.
     /// </summary>
     /// <param name="forecastJson">The weather forecast data in JSON format.</param>
-    /// <param name="city">The name of the city for which the weather forecast is being processed.</param>
     /// <returns>Returns an <see cref="ExitCode" /> indicating the result of the processing.</returns>
     private ExitCode ProcessWeatherForecast(string forecastJson)
     {
