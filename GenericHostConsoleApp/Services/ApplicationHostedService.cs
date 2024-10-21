@@ -143,7 +143,7 @@ public sealed class ApplicationHostedService : IHostedService, IDisposable
     {
         try
         {
-            return await _mainService.Main(args, cancellationToken).ConfigureAwait(false);
+            return await _mainService.MainAsync(args, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

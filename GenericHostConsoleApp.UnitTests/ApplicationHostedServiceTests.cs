@@ -48,7 +48,7 @@ public class ApplicationHostedServiceTests
         // Assert
         Mock.Get(mainService)
             .Verify(service =>
-                    service.Main(It.IsAny<string[]>(), It.IsAny<CancellationToken>()),
+                    service.MainAsync(It.IsAny<string[]>(), It.IsAny<CancellationToken>()),
                 Times.Once);
     }
 
@@ -61,7 +61,7 @@ public class ApplicationHostedServiceTests
         InitializeTest(out var applicationLifeTime, out _, out var mainService, out var applicationHostedService);
 
         Mock.Get(mainService)
-            .Setup(service => service.Main(It.IsAny<string[]>(), It.IsAny<CancellationToken>()))
+            .Setup(service => service.MainAsync(It.IsAny<string[]>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(ExitCode.Success);
 
         // Act
@@ -90,7 +90,7 @@ public class ApplicationHostedServiceTests
 
         // Assert
         Mock.Get(mainService).Verify(service =>
-                service.Main(It.IsAny<string[]>(), It.IsAny<CancellationToken>()),
+                service.MainAsync(It.IsAny<string[]>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
@@ -122,7 +122,7 @@ public class ApplicationHostedServiceTests
         InitializeTest(out var applicationLifeTime, out _, out var mainService, out var applicationHostedService);
 
         Mock.Get(mainService)
-            .Setup(service => service.Main(It.IsAny<string[]>(), It.IsAny<CancellationToken>()))
+            .Setup(service => service.MainAsync(It.IsAny<string[]>(), It.IsAny<CancellationToken>()))
             .Throws<TaskCanceledException>();
 
         // Act

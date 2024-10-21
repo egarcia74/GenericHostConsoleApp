@@ -11,5 +11,5 @@ public interface IMainService
     /// <param name="args">The command line arguments.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The application exit code.</returns>
-    Task<ExitCode> Main(string[] args, CancellationToken cancellationToken);
+    Task<ExitCode> MainAsync(string[] args, CancellationToken cancellationToken);
 }

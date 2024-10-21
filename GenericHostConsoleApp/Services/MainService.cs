@@ -1,118 +1,131 @@
 using System.Text.Json;
+using GenericHostConsoleApp.Models.WeatherForecast;
 using GenericHostConsoleApp.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace GenericHostConsoleApp.Services;
 
-// MainService.cs
-public sealed class MainService(
-    IConfiguration configuration,
-    ILogger<MainService> logger,
-    IWeatherForecastService weatherForecastService) : IMainService
+/// <summary>
+/// MainService is a core class responsible for orchestrating the main
+/// application logic, primarily interacting with various services and
+/// handling the application's entry-point activities.
+/// </summary>
+public sealed class MainService : IMainService
 {
-    private readonly IConfiguration _configuration =
-        configuration ?? throw new ArgumentNullException(nameof(configuration));
+    private readonly IConfiguration _configuration;
+    private readonly ILogger<MainService> _logger;
+    private readonly IWeatherForecastService _weatherForecastService;
 
-    private readonly ILogger<MainService> _logger =
-        logger ?? throw new ArgumentNullException(nameof(logger));
-
-    private readonly IWeatherForecastService _weatherForecastService =
-        weatherForecastService ?? throw new ArgumentNullException(nameof(weatherForecastService));
+    public MainService(IConfiguration configuration,
+        ILogger<MainService> logger,
+        IWeatherForecastService weatherForecastService)
+    {
+        _configuration = configuration;
+        _logger = logger;
+        _weatherForecastService = weatherForecastService;
+    }
 
     /// <summary>
-    ///     Executes the main application logic.
+    /// The key used to retrieve the city configuration value from the application's configuration settings.
     /// </summary>
-    /// <param name="args">The command-line arguments.</param>
-    /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
-    /// <returns>The exit code representing the outcome of the application execution.</returns>
-    public async Task<ExitCode> Main(string[] args, CancellationToken cancellationToken)
+    private const string CityConfigKey = "City";
+
+    /// <summary>
+    /// Executes the main functionality of the application.
+    /// </summary>
+    /// <param name="args">An array of command-line arguments passed to the application.</param>
+    /// <param name="cancellationToken">A token that can be used to signal the operation should be canceled.</param>
+    /// <returns>Returns an <see cref="ExitCode"/> indicating the result of the execution.</returns>
+    public async Task<ExitCode> MainAsync(string[] args, CancellationToken cancellationToken) // Renamed to MainAsync
     {
         try
         {
-            var city = _configuration.GetValue<string>("City") ??
-                       throw new InvalidOperationException("City not specified.");
-
+            var city = GetCityFromConfiguration();
+            
             var forecastJson = await _weatherForecastService
                 .FetchWeatherForecastAsync(city, cancellationToken)
                 .ConfigureAwait(false);
 
-            return ProcessWeatherForecast(forecastJson, city);
+            return ProcessWeatherForecast(forecastJson);
         }
-        catch (Exception ex) when (ex is ArgumentException || ex is InvalidOperationException ||
-                                   ex is JsonException)
+        catch (ArgumentException ex)
         {
-            _logger.LogError(ex, "An exception occurred during the main execution.");
+            _logger.LogError(ex, "An argument exception occurred during the main execution");
+            return ExitCode.InvalidArgument;
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "An invalid operation exception occurred during the main execution");
+            return ExitCode.InvalidOperation;
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "A JSON exception occurred during the main execution");
+            return ExitCode.InvalidJson;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected exception occurred during the main execution");
             return ExitCode.UnhandledException;
         }
     }
 
     /// <summary>
-    /// Processes the weather forecast JSON for a specified city.
+    /// Retrieves the city name from the application's configuration.
     /// </summary>
-    /// <param name="forecastJson">The JSON string containing the weather forecast data.</param>
-    /// <param name="city">The name of the city for which the weather forecast is processed.</param>
-    /// <returns>The exit code representing the outcome of the weather forecast processing.</returns>
-    private ExitCode ProcessWeatherForecast(string forecastJson, string city)
+    /// <returns>Returns the city name as a string if it exists in the configuration; otherwise, throws an InvalidOperationException.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the city configuration key is not specified or the value is empty.</exception>
+    private string GetCityFromConfiguration()
+    {
+        var city = _configuration.GetValue<string>(CityConfigKey);
+        if (string.IsNullOrEmpty(city))
+        {
+            throw new InvalidOperationException($"Configuration key '{CityConfigKey}' not specified.");
+        }
+
+        return city;
+    }
+
+    /// <summary>
+    /// Processes the weather forecast data for a specified city.
+    /// </summary>
+    /// <param name="forecastJson">The weather forecast data in JSON format.</param>
+    /// <param name="city">The name of the city for which the weather forecast is being processed.</param>
+    /// <returns>Returns an <see cref="ExitCode"/> indicating the result of the processing.</returns>
+    private ExitCode ProcessWeatherForecast(string forecastJson)
     {
         try
         {
-            using var root = JsonDocument.Parse(forecastJson);
-            if (root.RootElement.ValueKind != JsonValueKind.Object)
+            var weatherResponse = JsonSerializer.Deserialize<WeatherResponse>(forecastJson);
+            if (weatherResponse == null)
             {
-                _logger.LogError("Invalid JSON structure. Root element is not an object. JSON: {ForecastJson}",
-                    forecastJson);
-                return ExitCode.UnhandledException;
+                throw new JsonException("Failed to deserialize weather forecast.");
             }
 
-            if (!root.RootElement.TryGetProperty("main", out var main) ||
-                !main.TryGetProperty("temp", out var tempElement))
-            {
-                _logger.LogError("The JSON does not contain 'main' or 'temp' property. JSON: {ForecastJson}",
-                    forecastJson);
-                return ExitCode.UnhandledException;
-            }
-
-            var temp = KelvinToCelsius(tempElement.GetDouble());
-
-            if (!root.RootElement.TryGetProperty("weather", out var weatherArray) ||
-                weatherArray.ValueKind != JsonValueKind.Array || !weatherArray.EnumerateArray().Any())
-            {
-                _logger.LogError(
-                    "The JSON does not contain 'weather' property or it is empty. JSON: {ForecastJson}",
-                    forecastJson);
-                return ExitCode.UnhandledException;
-            }
-
-            var weather = weatherArray.EnumerateArray().First();
-            var weatherMain = weather.GetProperty("main").GetString();
-            var weatherDescription = weather.GetProperty("description").GetString();
-
-            if (string.IsNullOrEmpty(weatherMain) || string.IsNullOrEmpty(weatherDescription))
-            {
-                _logger.LogError(
-                    "The 'weather' property does not contain valid 'main' or 'description' values. JSON: {ForecastJson}",
-                    forecastJson);
-                return ExitCode.UnhandledException;
-            }
+            var temperature = KelvinToCelsius(weatherResponse.Main!.Temp);
 
             _logger.LogInformation(
-                "Weather Forecast for {City}: {Temperature:0}ºC - {WeatherMain} - {WeatherDescription}", city, temp,
-                weatherMain, weatherDescription);
+                "Weather Forecast for {City}: {Temperature:0}ºC - {WeatherMain} - {WeatherDescription}",
+                weatherResponse.Name,
+                temperature,
+                weatherResponse.Weather?.First().Main,
+                weatherResponse.Weather?.First().Description);
+
             return ExitCode.Success;
         }
         catch (JsonException ex)
         {
-            _logger.LogError(ex, "Failed to parse weather forecast JSON.");
-            return ExitCode.UnhandledException;
+            _logger.LogError(ex, "Failed to parse weather forecast JSON");
+            return ExitCode.InvalidJson;
         }
     }
 
     /// <summary>
-    ///     Converts a temperature from Kelvin to Celsius.
+    /// Converts a temperature value from Kelvin to Celsius.
     /// </summary>
-    /// <param name="kelvin">The temperature in Kelvin.</param>
-    /// <returns>The temperature in Celsius.</returns>
+    /// <param name="kelvin">The temperature value in Kelvin.</param>
+    /// <returns>The temperature value converted to Celsius.</returns>
     private static double KelvinToCelsius(double kelvin)
     {
         const double kelvinOffset = 273.15;
