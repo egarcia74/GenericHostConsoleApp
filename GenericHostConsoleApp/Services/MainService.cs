@@ -106,13 +106,20 @@ public sealed class MainService(
         {
             var weatherResponse = JsonSerializer.Deserialize<WeatherResponse>(forecastJson);
             if (weatherResponse == null) throw new JsonException("Failed to deserialize weather forecast.");
+
             var temperature = KelvinToCelsius(weatherResponse.Main!.Temp);
+            var minTemperature = KelvinToCelsius(weatherResponse.Main!.TempMin);
+            var maxTemperature = KelvinToCelsius(weatherResponse.Main!.TempMax);
+
             logger.LogInformation(
-                "Weather Forecast for {City}: {Temperature:0}ºC - {WeatherMain} - {WeatherDescription}",
+                "Weather Forecast for {City}: {Temperature:0}ºC; Min {MinTemperature:0}ºC; Max {MaxTemperature:0}ºC - {WeatherMain} - {WeatherDescription}",
                 weatherResponse.Name,
                 temperature,
+                minTemperature,
+                maxTemperature,
                 weatherResponse.Weather?.First().Main,
                 weatherResponse.Weather?.First().Description);
+
             return ExitCode.Success;
         }
         catch (JsonException ex)
