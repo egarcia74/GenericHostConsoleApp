@@ -18,11 +18,6 @@ public sealed class MainService(
     : IMainService
 {
     /// <summary>
-    ///     The key used to retrieve the city configuration value from the application's configuration settings.
-    /// </summary>
-    private const string CityConfigKey = "City";
-
-    /// <summary>
     ///     Executes the main functionality of the application.
     /// </summary>
     /// <param name="args">An array of command-line arguments passed to the application.</param>
@@ -89,9 +84,11 @@ public sealed class MainService(
     /// </exception>
     private string GetCityFromConfiguration()
     {
-        var city = configuration.GetValue<string>(CityConfigKey);
+        const string cityConfigKey = "City";
+        
+        var city = configuration.GetValue<string>(cityConfigKey);
         if (string.IsNullOrEmpty(city))
-            throw new InvalidOperationException($"Configuration key '{CityConfigKey}' not specified.");
+            throw new InvalidOperationException($"Configuration key '{cityConfigKey}' not specified.");
         return city;
     }
 
