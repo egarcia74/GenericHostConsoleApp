@@ -6,10 +6,10 @@ namespace GenericHostConsoleApp.Services.Interfaces;
 public interface IMainService
 {
     /// <summary>
-    ///     Executes the main application logic.
+    /// Executes the main functionality of the application.
     /// </summary>
-    /// <param name="args">The command line arguments.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The application exit code.</returns>
+    /// <param name="args">An array of command-line arguments passed to the application.</param>
+    /// <param name="cancellationToken">A token that can be used to signal the operation should be canceled.</param>
+    /// <returns>Returns an <see cref="ExitCode"/> indicating the result of the execution.</returns>
     Task<ExitCode> MainAsync(string[] args, CancellationToken cancellationToken);
 }
