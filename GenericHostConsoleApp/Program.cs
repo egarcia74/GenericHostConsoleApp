@@ -20,7 +20,8 @@ await Host.CreateDefaultBuilder(args)
         // Uncomment below code to add a command line configuration provider:
         builder.AddCommandLine(args, new Dictionary<string, string>
         {
-            { "-c", "City" }
+            { "-c", "City" },
+            { "--city", "City" }
         });
     })
     .ConfigureServices((hostContext, services) =>
