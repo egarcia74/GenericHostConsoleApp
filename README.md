@@ -22,9 +22,10 @@ This version adds a few extra bells and whistles such as:
   .
 * [Serilog](https://serilog.net) as the logging provider.
 * Unit tests using xUnit and Moq.
+* This reference implementation uses a weather forecast service that fetches the weather from [Open Weather](https://openweathermap.org).
 
 NOTES:
-* Be sure to specify your [Open Weather Map](https://openweathermap.org/api) API key in a .NET User Secrets file:
+* Be sure to specify your [Open Weather](https://openweathermap.org) API key in a .NET User Secrets file:
 
 ```
 {
