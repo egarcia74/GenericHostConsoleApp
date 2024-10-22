@@ -66,13 +66,13 @@ public sealed class MainService(
         }
 
         logger.LogInformation(
-            "Weather Forecast for {City} is {Temperature:0}ºC (feels like {FeelsLike:0}ºC) Min {MinTemperature:0}ºC Max {MaxTemperature:0}ºC - {WeatherMain} - {WeatherDescription}",
+            "Weather Forecast for {City} is {Temperature:0}ºC (feels like {FeelsLike:0}ºC) Min {MinTemperature:0}ºC Max {MaxTemperature:0}ºC - {WeatherDescription}",
             weatherResponse.Name,
             KelvinToCelsius(weatherResponse.Main.Temp),
             KelvinToCelsius(weatherResponse.Main.FeelsLike),
             KelvinToCelsius(weatherResponse.Main.TempMin),
             KelvinToCelsius(weatherResponse.Main.TempMax),
-            weatherResponse.Weather.First().Main,
+
             weatherResponse.Weather.First().Description);
     }
 
