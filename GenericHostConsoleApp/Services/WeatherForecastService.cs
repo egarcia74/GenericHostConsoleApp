@@ -22,7 +22,7 @@ public class WeatherForecastService(
     : IWeatherForecastService
 {
     /// <summary>
-    /// Fetches the weather forecast for a specified city from an external API asynchronously.
+    ///     Fetches the weather forecast for a specified city from an external API asynchronously.
     /// </summary>
     /// <param name="city">The name of the city for which to fetch the weather forecast.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
@@ -51,10 +51,7 @@ public class WeatherForecastService(
         try
         {
             var weatherResponse = JsonSerializer.Deserialize<WeatherResponse>(responseContent);
-            if (weatherResponse == null)
-            {
-                throw new WeatherForecastException("Failed to deserialize weather response.");
-            }
+            if (weatherResponse == null) throw new WeatherForecastException("Failed to deserialize weather response.");
 
             return weatherResponse;
         }

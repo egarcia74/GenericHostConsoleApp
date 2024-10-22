@@ -10,7 +10,6 @@ public sealed class MainService(
     ILogger<MainService> logger,
     IWeatherForecastService weatherForecastService) : IMainService
 {
-
     /// <summary>
     ///     Executes the main functionality of the application.
     /// </summary>
@@ -51,8 +50,8 @@ public sealed class MainService(
     }
 
     /// <summary>
-    /// Processes the weather forecast data by converting temperature values
-    /// from Kelvin to Celsius and logging the information.
+    ///     Processes the weather forecast data by converting temperature values
+    ///     from Kelvin to Celsius and logging the information.
     /// </summary>
     /// <param name="weatherResponse">The weather response data containing the forecast details.</param>
     private void ProcessWeatherForecast(WeatherResponse weatherResponse)
@@ -72,7 +71,6 @@ public sealed class MainService(
             KelvinToCelsius(weatherResponse.Main.FeelsLike),
             KelvinToCelsius(weatherResponse.Main.TempMin),
             KelvinToCelsius(weatherResponse.Main.TempMax),
-
             weatherResponse.Weather.First().Description);
     }
 

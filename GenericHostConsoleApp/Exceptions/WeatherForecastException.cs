@@ -1,5 +1,3 @@
-using System.Runtime.Serialization;
-
 namespace GenericHostConsoleApp.Exceptions;
 
 /// <summary>
@@ -10,7 +8,7 @@ public class WeatherForecastException : Exception
     public WeatherForecastException()
     {
     }
-    
+
     public WeatherForecastException(string message) : base(message)
     {
     }
