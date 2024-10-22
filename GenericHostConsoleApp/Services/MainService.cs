@@ -1,4 +1,3 @@
-using System.Text.Json;
 using GenericHostConsoleApp.Models.WeatherForecast;
 using GenericHostConsoleApp.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -25,50 +24,15 @@ public sealed class MainService(
     /// <returns>Returns an <see cref="ExitCode" /> indicating the result of the execution.</returns>
     public async Task<ExitCode> ExecuteMainAsync(string[] args, CancellationToken cancellationToken)
     {
-        try
-        {
-            var city = GetCityFromConfiguration();
-            var forecastJson = await weatherForecastService
-                .FetchWeatherForecastAsync(city, cancellationToken)
-                .ConfigureAwait(false);
-            return ProcessWeatherForecast(forecastJson);
-        }
-        catch (Exception ex) when (LogException(ex, out var result))
-        {
-            return result;
-        }
-    }
+        var city = GetCityFromConfiguration();
 
-    /// <summary>
-    ///     Logs the exception and returns proper exit code.
-    /// </summary>
-    /// <param name="ex">Exception occurred during the execution.</param>
-    /// <param name="exitCode">Exit code indicating the result of the execution.</param>
-    /// <returns>Returns true to indicate a valid exit code for the caller.</returns>
-    private bool LogException(Exception ex, out ExitCode exitCode)
-    {
-        switch (ex)
-        {
-            case ArgumentException argumentException:
-                logger.LogError(argumentException, "An argument exception occurred during the main execution");
-                exitCode = ExitCode.InvalidArgument;
-                break;
-            case InvalidOperationException invalidOperationException:
-                logger.LogError(invalidOperationException,
-                    "An invalid operation exception occurred during the main execution");
-                exitCode = ExitCode.InvalidOperation;
-                break;
-            case JsonException jsonException:
-                logger.LogError(jsonException, "A JSON exception occurred during the main execution");
-                exitCode = ExitCode.InvalidJson;
-                break;
-            default:
-                logger.LogError(ex, "An unexpected exception occurred during the main execution");
-                exitCode = ExitCode.UnhandledException;
-                break;
-        }
+        var weatherResponse = await weatherForecastService
+            .FetchWeatherForecastAsync(city, cancellationToken)
+            .ConfigureAwait(false);
 
-        return true;
+        ProcessWeatherForecast(weatherResponse);
+
+        return ExitCode.Success;
     }
 
     /// <summary>
@@ -85,7 +49,7 @@ public sealed class MainService(
     private string GetCityFromConfiguration()
     {
         const string cityConfigKey = "City";
-        
+
         var city = configuration.GetValue<string>(cityConfigKey);
         if (string.IsNullOrEmpty(city))
             throw new InvalidOperationException($"Configuration key '{cityConfigKey}' not specified.");
@@ -93,39 +57,21 @@ public sealed class MainService(
     }
 
     /// <summary>
-    ///     Processes the weather forecast data for a specified city.
+    /// Processes the weather forecast data by converting temperature values
+    /// from Kelvin to Celsius and logging the information.
     /// </summary>
-    /// <param name="forecastJson">The weather forecast data in JSON format.</param>
-    /// <returns>Returns an <see cref="ExitCode" /> indicating the result of the processing.</returns>
-    private ExitCode ProcessWeatherForecast(string forecastJson)
+    /// <param name="weatherResponse">The weather response data containing the forecast details.</param>
+    private void ProcessWeatherForecast(WeatherResponse weatherResponse)
     {
-        try
-        {
-            var weatherResponse = JsonSerializer.Deserialize<WeatherResponse>(forecastJson);
-            if (weatherResponse == null) throw new JsonException("Failed to deserialize weather forecast.");
-
-            var temperature = KelvinToCelsius(weatherResponse.Main!.Temp);
-            var feelsLike = KelvinToCelsius(weatherResponse.Main!.FeelsLike);
-            var minTemperature = KelvinToCelsius(weatherResponse.Main!.TempMin);
-            var maxTemperature = KelvinToCelsius(weatherResponse.Main!.TempMax);
-
-            logger.LogInformation(
-                "Weather Forecast for {City} is {Temperature:0}ºC (feels like {FeelsLike:0}ºC) Min {MinTemperature:0}ºC Max {MaxTemperature:0}ºC - {WeatherMain} - {WeatherDescription}",
-                weatherResponse.Name,
-                temperature,
-                feelsLike,
-                minTemperature,
-                maxTemperature,
-                weatherResponse.Weather?.First().Main,
-                weatherResponse.Weather?.First().Description);
-
-            return ExitCode.Success;
-        }
-        catch (JsonException ex)
-        {
-            logger.LogError(ex, "Failed to parse weather forecast JSON");
-            return ExitCode.InvalidJson;
-        }
+        logger.LogInformation(
+            "Weather Forecast for {City} is {Temperature:0}ºC (feels like {FeelsLike:0}ºC) Min {MinTemperature:0}ºC Max {MaxTemperature:0}ºC - {WeatherMain} - {WeatherDescription}",
+            weatherResponse.Name,
+            KelvinToCelsius(weatherResponse.Main!.Temp),
+            KelvinToCelsius(weatherResponse.Main!.FeelsLike),
+            KelvinToCelsius(weatherResponse.Main!.TempMin),
+            KelvinToCelsius(weatherResponse.Main!.TempMax),
+            weatherResponse.Weather?.First().Main,
+            weatherResponse.Weather?.First().Description);
     }
 
     /// <summary>

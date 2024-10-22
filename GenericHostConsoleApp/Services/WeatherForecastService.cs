@@ -1,6 +1,8 @@
 using System.Diagnostics;
+using System.Text.Json;
 using GenericHostConsoleApp.Configuration;
 using GenericHostConsoleApp.Exceptions;
+using GenericHostConsoleApp.Models.WeatherForecast;
 using GenericHostConsoleApp.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -20,12 +22,12 @@ public class WeatherForecastService(
     : IWeatherForecastService
 {
     /// <summary>
-    ///     Fetches the weather forecast asynchronously.
+    /// Fetches the weather forecast for a specified city from an external API asynchronously.
     /// </summary>
-    /// <param name="city">The city to get the forecast for.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The weather forecast as a string.</returns>
-    public async Task<string> FetchWeatherForecastAsync(string city, CancellationToken cancellationToken)
+    /// <param name="city">The name of the city for which to fetch the weather forecast.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A Task representing the asynchronous operation, which upon completion contains the weather forecast response.</returns>
+    public async Task<WeatherResponse> FetchWeatherForecastAsync(string city, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -43,7 +45,23 @@ public class WeatherForecastService(
             throw new WeatherForecastException(
                 $"Failed to fetch weather data: Status: {response.StatusCode}; {response.Content}"); // Use a more specific exception type
 
-        return await response.Content.ReadAsStringAsync(cancellationToken);
+        // Process the response
+        var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
+
+        try
+        {
+            var weatherResponse = JsonSerializer.Deserialize<WeatherResponse>(responseContent);
+            if (weatherResponse == null)
+            {
+                throw new WeatherForecastException("Failed to deserialize weather response.");
+            }
+
+            return weatherResponse;
+        }
+        catch (JsonException ex)
+        {
+            throw new WeatherForecastException("Failed to parse weather data.", ex);
+        }
     }
 
     /// <summary>
