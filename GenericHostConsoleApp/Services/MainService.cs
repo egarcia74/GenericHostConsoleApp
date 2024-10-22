@@ -5,17 +5,12 @@ using Microsoft.Extensions.Logging;
 
 namespace GenericHostConsoleApp.Services;
 
-/// <summary>
-///     MainService is a core class responsible for orchestrating the main
-///     application logic, primarily interacting with various services and
-///     handling the application's entry-point activities.
-/// </summary>
 public sealed class MainService(
     IConfiguration configuration,
     ILogger<MainService> logger,
-    IWeatherForecastService weatherForecastService)
-    : IMainService
+    IWeatherForecastService weatherForecastService) : IMainService
 {
+
     /// <summary>
     ///     Executes the main functionality of the application.
     /// </summary>
@@ -49,7 +44,6 @@ public sealed class MainService(
     private string GetCityFromConfiguration()
     {
         const string cityConfigKey = "City";
-
         var city = configuration.GetValue<string>(cityConfigKey);
         if (string.IsNullOrEmpty(city))
             throw new InvalidOperationException($"Configuration key '{cityConfigKey}' not specified.");
@@ -63,15 +57,23 @@ public sealed class MainService(
     /// <param name="weatherResponse">The weather response data containing the forecast details.</param>
     private void ProcessWeatherForecast(WeatherResponse weatherResponse)
     {
+        ArgumentNullException.ThrowIfNull(weatherResponse);
+
+        if (weatherResponse.Main == null || weatherResponse.Weather == null || weatherResponse.Weather.Count == 0)
+        {
+            logger.LogWarning("Weather response does not contain necessary data");
+            return;
+        }
+
         logger.LogInformation(
             "Weather Forecast for {City} is {Temperature:0}ºC (feels like {FeelsLike:0}ºC) Min {MinTemperature:0}ºC Max {MaxTemperature:0}ºC - {WeatherMain} - {WeatherDescription}",
             weatherResponse.Name,
-            KelvinToCelsius(weatherResponse.Main!.Temp),
-            KelvinToCelsius(weatherResponse.Main!.FeelsLike),
-            KelvinToCelsius(weatherResponse.Main!.TempMin),
-            KelvinToCelsius(weatherResponse.Main!.TempMax),
-            weatherResponse.Weather?.First().Main,
-            weatherResponse.Weather?.First().Description);
+            KelvinToCelsius(weatherResponse.Main.Temp),
+            KelvinToCelsius(weatherResponse.Main.FeelsLike),
+            KelvinToCelsius(weatherResponse.Main.TempMin),
+            KelvinToCelsius(weatherResponse.Main.TempMax),
+            weatherResponse.Weather.First().Main,
+            weatherResponse.Weather.First().Description);
     }
 
     /// <summary>
