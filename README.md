@@ -23,8 +23,8 @@ This version adds a few extra bells and whistles such as:
 * [Serilog](https://serilog.net) as the logging provider.
 * Unit tests using xUnit and Moq.
 
-NOTE:
-  Be sure to specify your [Open Weather Map](https://openweathermap.org/api) API key in a .NET User Secrets file:
+NOTES:
+* Be sure to specify your [Open Weather Map](https://openweathermap.org/api) API key in a .NET User Secrets file:
 
 ```
 {
@@ -32,6 +32,11 @@ NOTE:
     "ApiKey": "123456789123456789"
   }
 }
+```
+
+* To run, specify the City to get the weather forecast using the command line as follows:
+```
+dotnet run -- --city Berlin
 ```
 
 [![.NET](https://github.com/egarcia74/GenericHostConsoleApp/actions/workflows/dotnet.yml/badge.svg)](https://github.com/egarcia74/GenericHostConsoleApp/actions/workflows/dotnet.yml)
