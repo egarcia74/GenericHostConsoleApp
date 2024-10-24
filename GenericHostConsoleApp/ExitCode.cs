@@ -1,7 +1,7 @@
 namespace GenericHostConsoleApp;
 
 /// <summary>
-///     Exit codes used in this application.
+/// Indicates that the application failed to complete successfully.
 /// </summary>
 public enum ExitCode
 {
@@ -16,17 +16,12 @@ public enum ExitCode
     Cancelled,
 
     /// <summary>
-    ///     Indicates that there was an unhandled exception.
-    /// </summary>
-    UnhandledException,
-
-    /// <summary>
     ///     Indicates that the application was aborted.
     /// </summary>
     Aborted,
 
     /// <summary>
-    ///     Indicates that there was an AggregateException.
+    /// Indicates that the application failed to complete successfully.
     /// </summary>
-    AggregateException
+    Failed
 }

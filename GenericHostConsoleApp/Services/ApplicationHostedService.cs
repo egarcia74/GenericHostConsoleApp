@@ -180,11 +180,11 @@ public sealed class ApplicationHostedService : IHostedService, IDisposable
                     _logger.LogAggregateException(exception);
                     return true;
                 });
-                return ExitCode.AggregateException;
+                return ExitCode.Failed;
 
             default:
                 _logger.LogUnhandledException(ex);
-                return ExitCode.UnhandledException;
+                return ExitCode.Failed;
         }
     }
 
