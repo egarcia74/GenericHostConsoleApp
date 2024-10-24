@@ -5,6 +5,9 @@ using Microsoft.Extensions.Logging;
 
 namespace GenericHostConsoleApp.Services;
 
+/// <summary>
+/// Main service responsible for executing the core application logic.
+/// </summary>
 public sealed class MainService(
     IConfiguration configuration,
     ILogger<MainService> logger,
@@ -20,11 +23,11 @@ public sealed class MainService(
     {
         var city = GetCityFromConfiguration();
 
-        var weatherResponse = await weatherForecastService
+        var weatherForecast = await weatherForecastService
             .FetchWeatherForecastAsync(city, cancellationToken)
             .ConfigureAwait(false);
 
-        ProcessWeatherForecast(weatherResponse);
+        ProcessWeatherForecast(weatherForecast);
 
         return ExitCode.Success;
     }
