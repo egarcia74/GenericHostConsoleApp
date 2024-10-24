@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace GenericHostConsoleApp.Services;
 
 /// <summary>
-/// Main service responsible for executing the core application logic.
+///     Main service responsible for executing the core application logic.
 /// </summary>
 public sealed class MainService(
     IConfiguration configuration,

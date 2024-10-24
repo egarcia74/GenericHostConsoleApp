@@ -1,7 +1,7 @@
 namespace GenericHostConsoleApp;
 
 /// <summary>
-/// Indicates that the application failed to complete successfully.
+///     Indicates that the application failed to complete successfully.
 /// </summary>
 public enum ExitCode
 {
@@ -21,7 +21,7 @@ public enum ExitCode
     Aborted,
 
     /// <summary>
-    /// Indicates that the application failed to complete successfully.
+    ///     Indicates that the application failed to complete successfully.
     /// </summary>
     Failed
 }

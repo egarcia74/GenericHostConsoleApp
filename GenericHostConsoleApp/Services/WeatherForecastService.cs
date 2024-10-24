@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Net;
 using System.Text.Json;
 using GenericHostConsoleApp.Configuration;
 using GenericHostConsoleApp.Exceptions;
@@ -42,8 +43,12 @@ public class WeatherForecastService(
         var response = await policyWrap.ExecuteAsync(token => httpClient.GetAsync(url, token), cancellationToken);
 
         if (!response.IsSuccessStatusCode)
-            throw new WeatherForecastException(
-                $"Failed to fetch weather data: Status: {response.StatusCode}; {response.Content}"); // Use a more specific exception type
+            if (response.StatusCode == HttpStatusCode.NotFound)
+                throw new WeatherForecastException(
+                    $"The city \"{city}\" does not exist.");
+            else
+                throw new WeatherForecastException(
+                    $"Failed to fetch weather data: Status: {response.StatusCode}; {response.Content}");
 
         // Process the response
         var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
