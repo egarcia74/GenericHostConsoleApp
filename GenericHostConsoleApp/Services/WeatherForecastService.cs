@@ -41,18 +41,19 @@ public class WeatherForecastService(
 
         var policyWrap = GetPolicy();
 
-        var response = await policyWrap.ExecuteAsync(token => httpClient.GetAsync(url, token), cancellationToken);
+        using var response = await policyWrap.ExecuteAsync(token => httpClient.GetAsync(url, token), cancellationToken);
 
         if (!response.IsSuccessStatusCode)
+        {
             if (response.StatusCode == HttpStatusCode.NotFound)
-                throw new WeatherForecastException(
-                    $"The city \"{city}\" does not exist.");
-            else
-                throw new WeatherForecastException(
-                    $"Failed to fetch weather data: Status: {response.StatusCode}; {response.Content}");
+                throw new WeatherForecastException($"The city \"{city}\" does not exist.");
+
+            throw new WeatherForecastException(
+                $"Failed to fetch weather data: Status: {response.StatusCode}; {response.Content}");
+        }
 
         // Process the response
-        var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
+        var responseContent = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
         try
         {
