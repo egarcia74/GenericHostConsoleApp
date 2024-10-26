@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Net;
 using System.Text.Json;
 using GenericHostConsoleApp.Configuration;
@@ -34,8 +33,10 @@ public class WeatherForecastService(
 
         var url = $"{options.Value.Url}?q={city}&appid={options.Value.ApiKey}";
 
+        if (string.IsNullOrEmpty(options?.Value?.Url) || string.IsNullOrEmpty(options?.Value?.ApiKey))
+            throw new WeatherForecastException("WeatherForecastServiceOptions are not properly configured.");
+
         // Log the URL but obfuscate the key for security
-        Debug.Assert(options.Value.ApiKey != null, "options.Value.ApiKey != null");
         logger.LogInformation("OpenWeather Url: {Url}", url.Replace(options.Value.ApiKey, "*****"));
 
         var policyWrap = GetPolicy();
