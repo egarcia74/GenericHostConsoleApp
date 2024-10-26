@@ -171,7 +171,7 @@ public sealed class ApplicationHostedService : IHostedService, IDisposable
         {
             case TaskCanceledException:
             case OperationCanceledException:
-                _logger.LogApplicationCancelled();
+                _logger.LogApplicationCanceled();
                 return ExitCode.Cancelled;
 
             case AggregateException aggregateException:
