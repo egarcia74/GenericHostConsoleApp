@@ -16,30 +16,6 @@ public static partial class LoggerExtensions
     public static partial void LogUnhandledException(this ILogger logger, Exception ex);
 
     /// <summary>
-    ///     Logs the details of an argument null exception.
-    /// </summary>
-    /// <param name="ex">The unhandled exception.</param>
-    /// <param name="logger">The <see cref="ILogger{TCategoryName}" /> to use.</param>
-    [LoggerMessage(2, LogLevel.Critical, "An argument null exception has occurred")]
-    public static partial void LogArgumentNullException(this ILogger logger, Exception ex);
-
-    /// <summary>
-    ///     Logs the details of an argument exception.
-    /// </summary>
-    /// <param name="ex">The unhandled exception.</param>
-    /// <param name="logger">The <see cref="ILogger{TCategoryName}" /> to use.</param>
-    [LoggerMessage(3, LogLevel.Critical, "An argument exception has occurred")]
-    public static partial void LogArgumentException(this ILogger logger, Exception ex);
-
-    /// <summary>
-    ///     Logs the details of an unhandled exception.
-    /// </summary>
-    /// <param name="ex">The invalid operation exception.</param>
-    /// <param name="logger">The <see cref="ILogger{TCategoryName}" /> to use.</param>
-    [LoggerMessage(4, LogLevel.Critical, "An invalid argument exception has occurred")]
-    public static partial void LogInvalidOperationException(this ILogger logger, Exception ex);
-
-    /// <summary>
     ///     Logs a message indicating that the application was cancelled.
     /// </summary>
     /// <param name="logger">The <see cref="ILogger{TCategoryName}" /> to use.</param>
@@ -83,16 +59,6 @@ public static partial class LoggerExtensions
     /// <param name="exitCodeAsInt">The exit code as an <see cref="int" />.</param>
     [LoggerMessage(10, LogLevel.Information, "Application is exiting with exit code: {ExitCode} ({ExitCodeAsInt})")]
     public static partial void LogApplicationExiting(this ILogger logger, ExitCode exitCode, int exitCodeAsInt);
-
-    /// <summary>
-    ///     Logs details of configuration data.
-    /// </summary>
-    /// <param name="logger">The <see cref="ILogger{TCategoryName}" /> to use.</param>
-    /// <param name="name">The name of the configuration item.</param>
-    /// <param name="value">The value of the configuration item.</param>
-    [LoggerMessage(11, LogLevel.Information, "Configuration: {Name} = {Value}")]
-    public static partial void LogConfigurationDetails(this ILogger logger, string name, string value);
-
 
     /// <summary>
     ///     Logs the details of an aggregate exception.
