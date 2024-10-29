@@ -67,15 +67,34 @@ public sealed class MainService(
             return;
         }
 
+        var temperatureUnit = configuration.GetValue<TemperatureUnit>("TemperatureUnit");
+        var temperatureUnitCode = temperatureUnit == TemperatureUnit.Celsius ? "C" : "F";
+        var temperature = TemperatureConverter.ConvertTemperature(weatherResponse.Main.Temp, TemperatureUnit.Kelvin,
+            temperatureUnit == TemperatureUnit.Celsius ? TemperatureUnit.Celsius : TemperatureUnit.Fahrenheit);
+        var feelsLike = TemperatureConverter.ConvertTemperature(weatherResponse.Main.FeelsLike, TemperatureUnit.Kelvin,
+            temperatureUnit == TemperatureUnit.Celsius ? TemperatureUnit.Celsius : TemperatureUnit.Fahrenheit);
+        var tempMin = TemperatureConverter.ConvertTemperature(weatherResponse.Main.TempMin, TemperatureUnit.Kelvin,
+            temperatureUnit == TemperatureUnit.Celsius ? TemperatureUnit.Celsius : TemperatureUnit.Fahrenheit);
+        var tempMax = TemperatureConverter.ConvertTemperature(weatherResponse.Main.TempMax, TemperatureUnit.Kelvin,
+            temperatureUnit == TemperatureUnit.Celsius ? TemperatureUnit.Celsius : TemperatureUnit.Fahrenheit);
+
+        var logMessage =
+            $"Weather Forecast for {weatherResponse.Name} is {temperature:0}º{temperatureUnitCode} " +
+            $"(feels like {feelsLike:0}º{temperatureUnitCode}) " + 
+            $"Min {tempMin:0}º{temperatureUnitCode} " +
+            $"Max {tempMax:0}º{temperatureUnitCode} - " + 
+            $"{weatherResponse.Weather.First().Description}";
+
         logger.LogInformation(
-            "Weather Forecast for {City} is {Temperature:0}ºC (feels like {FeelsLike:0}ºC) Min {MinTemperature:0}ºC Max {MaxTemperature:0}ºC - {WeatherDescription}",
+            logMessage,
             weatherResponse.Name,
-            KelvinToCelsius(weatherResponse.Main.Temp),
-            KelvinToCelsius(weatherResponse.Main.FeelsLike),
-            KelvinToCelsius(weatherResponse.Main.TempMin),
-            KelvinToCelsius(weatherResponse.Main.TempMax),
+            temperature,
+            feelsLike,
+            tempMin,
+            tempMax,
             weatherResponse.Weather.First().Description);
     }
+
 
     /// <summary>
     ///     Converts a temperature value from Kelvin to Celsius.
@@ -86,5 +105,11 @@ public sealed class MainService(
     {
         const double kelvinOffset = 273.15;
         return kelvin - kelvinOffset;
+    }
+
+    public static double KelvinToFahrenheit(double kelvin)
+    {
+        const double kelvinOffset = 273.15;
+        return (kelvin - kelvinOffset) * 9 / 5 + 32;
     }
 }
