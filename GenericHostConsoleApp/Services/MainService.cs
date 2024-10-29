@@ -69,20 +69,40 @@ public sealed class MainService(
 
         var temperatureUnit = configuration.GetValue<TemperatureUnit>("TemperatureUnit");
         var temperatureUnitCode = temperatureUnit == TemperatureUnit.Celsius ? "C" : "F";
-        var temperature = TemperatureConverter.ConvertTemperature(weatherResponse.Main.Temp, TemperatureUnit.Kelvin,
-            temperatureUnit == TemperatureUnit.Celsius ? TemperatureUnit.Celsius : TemperatureUnit.Fahrenheit);
-        var feelsLike = TemperatureConverter.ConvertTemperature(weatherResponse.Main.FeelsLike, TemperatureUnit.Kelvin,
-            temperatureUnit == TemperatureUnit.Celsius ? TemperatureUnit.Celsius : TemperatureUnit.Fahrenheit);
-        var tempMin = TemperatureConverter.ConvertTemperature(weatherResponse.Main.TempMin, TemperatureUnit.Kelvin,
-            temperatureUnit == TemperatureUnit.Celsius ? TemperatureUnit.Celsius : TemperatureUnit.Fahrenheit);
-        var tempMax = TemperatureConverter.ConvertTemperature(weatherResponse.Main.TempMax, TemperatureUnit.Kelvin,
-            temperatureUnit == TemperatureUnit.Celsius ? TemperatureUnit.Celsius : TemperatureUnit.Fahrenheit);
+
+        var temperature = TemperatureConverter.ConvertTemperature(
+            weatherResponse.Main.Temp,
+            TemperatureUnit.Kelvin,
+            temperatureUnit == TemperatureUnit.Celsius
+                ? TemperatureUnit.Celsius
+                : TemperatureUnit.Fahrenheit);
+
+        var feelsLike = TemperatureConverter.ConvertTemperature(
+            weatherResponse.Main.FeelsLike,
+            TemperatureUnit.Kelvin,
+            temperatureUnit == TemperatureUnit.Celsius
+                ? TemperatureUnit.Celsius
+                : TemperatureUnit.Fahrenheit);
+
+        var tempMin = TemperatureConverter.ConvertTemperature(
+            weatherResponse.Main.TempMin,
+            TemperatureUnit.Kelvin,
+            temperatureUnit == TemperatureUnit.Celsius
+                ? TemperatureUnit.Celsius
+                : TemperatureUnit.Fahrenheit);
+
+        var tempMax = TemperatureConverter.ConvertTemperature(
+            weatherResponse.Main.TempMax,
+            TemperatureUnit.Kelvin,
+            temperatureUnit == TemperatureUnit.Celsius
+                ? TemperatureUnit.Celsius
+                : TemperatureUnit.Fahrenheit);
 
         var logMessage =
             $"Weather Forecast for {weatherResponse.Name} is {temperature:0}º{temperatureUnitCode} " +
-            $"(feels like {feelsLike:0}º{temperatureUnitCode}) " + 
+            $"(feels like {feelsLike:0}º{temperatureUnitCode}) " +
             $"Min {tempMin:0}º{temperatureUnitCode} " +
-            $"Max {tempMax:0}º{temperatureUnitCode} - " + 
+            $"Max {tempMax:0}º{temperatureUnitCode} - " +
             $"{weatherResponse.Weather.First().Description}";
 
         logger.LogInformation(
@@ -93,23 +113,5 @@ public sealed class MainService(
             tempMin,
             tempMax,
             weatherResponse.Weather.First().Description);
-    }
-
-
-    /// <summary>
-    ///     Converts a temperature value from Kelvin to Celsius.
-    /// </summary>
-    /// <param name="kelvin">The temperature value in Kelvin.</param>
-    /// <returns>The temperature value converted to Celsius.</returns>
-    private static double KelvinToCelsius(double kelvin)
-    {
-        const double kelvinOffset = 273.15;
-        return kelvin - kelvinOffset;
-    }
-
-    public static double KelvinToFahrenheit(double kelvin)
-    {
-        const double kelvinOffset = 273.15;
-        return (kelvin - kelvinOffset) * 9 / 5 + 32;
     }
 }

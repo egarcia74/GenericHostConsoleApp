@@ -1,7 +1,7 @@
 namespace GenericHostConsoleApp;
 
 /// <summary>
-/// A static utility class for converting temperature values between different units.
+///     A static utility class for converting temperature values between different units.
 /// </summary>
 public static class TemperatureConverter
 {
