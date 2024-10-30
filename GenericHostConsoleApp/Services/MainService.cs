@@ -68,35 +68,34 @@ public sealed class MainService(
         }
 
         var temperatureUnit = configuration.GetValue<TemperatureUnit>("TemperatureUnit");
-        var temperatureUnitCode = temperatureUnit == TemperatureUnit.Celsius ? "C" : "F";
+
+        var temperatureUnitCode = temperatureUnit switch
+        {
+            TemperatureUnit.Celsius => "C",
+            TemperatureUnit.Fahrenheit => "F",
+            TemperatureUnit.Kelvin => "K",
+            _ => throw new InvalidOperationException("Invalid temperature unit.")
+        };
 
         var temperature = TemperatureConverter.ConvertTemperature(
             weatherResponse.Main.Temp,
             TemperatureUnit.Kelvin,
-            temperatureUnit == TemperatureUnit.Celsius
-                ? TemperatureUnit.Celsius
-                : TemperatureUnit.Fahrenheit);
+            temperatureUnit);
 
         var feelsLike = TemperatureConverter.ConvertTemperature(
             weatherResponse.Main.FeelsLike,
             TemperatureUnit.Kelvin,
-            temperatureUnit == TemperatureUnit.Celsius
-                ? TemperatureUnit.Celsius
-                : TemperatureUnit.Fahrenheit);
+            temperatureUnit);
 
         var tempMin = TemperatureConverter.ConvertTemperature(
             weatherResponse.Main.TempMin,
             TemperatureUnit.Kelvin,
-            temperatureUnit == TemperatureUnit.Celsius
-                ? TemperatureUnit.Celsius
-                : TemperatureUnit.Fahrenheit);
+            temperatureUnit);
 
         var tempMax = TemperatureConverter.ConvertTemperature(
             weatherResponse.Main.TempMax,
             TemperatureUnit.Kelvin,
-            temperatureUnit == TemperatureUnit.Celsius
-                ? TemperatureUnit.Celsius
-                : TemperatureUnit.Fahrenheit);
+            temperatureUnit);
 
         var logMessage =
             $"Weather Forecast for {weatherResponse.Name} is {temperature:0}º{temperatureUnitCode} " +
