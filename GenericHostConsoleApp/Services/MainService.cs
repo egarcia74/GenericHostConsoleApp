@@ -69,16 +69,13 @@ public sealed class MainService(
 
         var temperatureUnit = configuration.GetValue<TemperatureUnit>("TemperatureUnit");
 
-        var temperatureUnitCode = temperatureUnit switch
-        {
-            TemperatureUnit.Celsius => "C",
-            TemperatureUnit.Fahrenheit => "F",
-            TemperatureUnit.Kelvin => "K",
-            _ => throw new InvalidOperationException("Invalid temperature unit.")
-        };
+        LogWeather(weatherResponse, temperatureUnit);
+    }
 
+    private void LogWeather(WeatherResponse weatherResponse, TemperatureUnit temperatureUnit)
+    {
         var temperature = TemperatureConverter.ConvertTemperature(
-            weatherResponse.Main.Temp,
+            weatherResponse.Main!.Temp,
             TemperatureUnit.Kelvin,
             temperatureUnit);
 
@@ -97,20 +94,43 @@ public sealed class MainService(
             TemperatureUnit.Kelvin,
             temperatureUnit);
 
-        var logMessage =
-            $"Weather Forecast for {weatherResponse.Name} is {temperature:0}º{temperatureUnitCode} " +
-            $"(feels like {feelsLike:0}º{temperatureUnitCode}) " +
-            $"Min {tempMin:0}º{temperatureUnitCode} " +
-            $"Max {tempMax:0}º{temperatureUnitCode} - " +
-            $"{weatherResponse.Weather.First().Description}";
+        switch (temperatureUnit)
+        {
+            case TemperatureUnit.Celsius:
+                logger.LogInformation(
+                    "Weather forecast for {City} is {Temperature:0}ºC (feels like {FeelsLike:0}ºC) Min {TempMin:0}ºC Max {TempMax:0}ºC {WeatherDescription}",
+                    weatherResponse.Name,
+                    temperature,
+                    feelsLike,
+                    tempMin,
+                    tempMax,
+                    weatherResponse.Weather!.First().Description);
+                break;
 
-        logger.LogInformation(
-            logMessage,
-            weatherResponse.Name,
-            temperature,
-            feelsLike,
-            tempMin,
-            tempMax,
-            weatherResponse.Weather.First().Description);
+            case TemperatureUnit.Fahrenheit:
+                logger.LogInformation(
+                    "Weather forecast for {City} is {Temperature:0}ºF (feels like {FeelsLike:0}ºF) Min {TempMin:0}ºF Max {TempMax:0}ºF {WeatherDescription}",
+                    weatherResponse.Name,
+                    temperature,
+                    feelsLike,
+                    tempMin,
+                    tempMax,
+                    weatherResponse.Weather!.First().Description);
+                break;
+
+            case TemperatureUnit.Kelvin:
+                logger.LogInformation(
+                    "Weather forecast for {City} is {Temperature:0}ºK (feels like {FeelsLike:0}ºK) Min {TempMin:0}ºK Max {TempMax:0}ºK {WeatherDescription}",
+                    weatherResponse.Name,
+                    temperature,
+                    feelsLike,
+                    tempMin,
+                    tempMax,
+                    weatherResponse.Weather!.First().Description);
+                break;
+            
+            default:
+                throw new InvalidOperationException($"Unknown temperature unit: {temperatureUnit}");
+        }
     }
 }
