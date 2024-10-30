@@ -61,7 +61,7 @@ public sealed class MainService(
     {
         ArgumentNullException.ThrowIfNull(weatherResponse);
 
-        if (weatherResponse.Main == null || weatherResponse.Weather == null || weatherResponse.Weather.Count == 0)
+        if (weatherResponse.Main is null || weatherResponse.Weather is null || weatherResponse.Weather.Count == 0)
         {
             logger.LogWarning("Weather response does not contain necessary data");
             return;
@@ -73,7 +73,7 @@ public sealed class MainService(
     }
 
     /// <summary>
-    /// Logs the weather forecast details in the specified temperature unit.
+    ///     Logs the weather forecast details in the specified temperature unit.
     /// </summary>
     /// <param name="weatherResponse">The weather response data to be logged.</param>
     /// <param name="temperatureUnit">The unit in which the temperature should be logged (Celsius, Fahrenheit, or Kelvin).</param>
@@ -133,7 +133,7 @@ public sealed class MainService(
                     tempMax,
                     weatherResponse.Weather!.First().Description);
                 break;
-            
+
             default:
                 throw new InvalidOperationException($"Unknown temperature unit: {temperatureUnit}");
         }
