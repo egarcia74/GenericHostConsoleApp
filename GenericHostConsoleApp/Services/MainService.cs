@@ -67,7 +67,7 @@ public sealed class MainService(
         {
             const string temperatureUnitKey = "TemperatureUnit";
 
-            if (string.IsNullOrEmpty(configuration.GetValue<String>(temperatureUnitKey)))
+            if (string.IsNullOrEmpty(configuration.GetValue<string>(temperatureUnitKey)))
             {
                 throw new InvalidOperationException($"Configuration key '{temperatureUnitKey}' not specified.");
             }
