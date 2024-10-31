@@ -21,10 +21,8 @@ public sealed class MainService(
     /// <returns>Returns an <see cref="ExitCode" /> indicating the result of the execution.</returns>
     public async Task<ExitCode> ExecuteMainAsync(string[] args, CancellationToken cancellationToken)
     {
-        var city = GetCityFromConfiguration();
-
         var weatherForecast = await weatherForecastService
-            .FetchWeatherForecastAsync(city, cancellationToken)
+            .FetchWeatherForecastAsync(City, cancellationToken)
             .ConfigureAwait(false);
 
         ProcessWeatherForecast(weatherForecast);
@@ -35,42 +33,49 @@ public sealed class MainService(
     /// <summary>
     ///     Retrieves the city name from the application's configuration.
     /// </summary>
-    /// <returns>
+    /// <value>
     ///     Returns the city name as a string if it exists in the configuration; otherwise, throws an
     ///     InvalidOperationException.
-    /// </returns>
+    /// </value>
     /// <exception cref="InvalidOperationException">
     ///     Thrown when the city configuration key is not specified or the value is
     ///     empty.
     /// </exception>
-    private string GetCityFromConfiguration()
+    private string City
     {
-        const string cityConfigKey = "City";
+        get
+        {
+            const string cityConfigKey = "City";
 
-        var city = configuration.GetValue<string>(cityConfigKey);
+            var city = configuration.GetValue<string>(cityConfigKey);
 
-        if (string.IsNullOrEmpty(city))
-            throw new InvalidOperationException($"Configuration key '{cityConfigKey}' not specified.");
+            if (string.IsNullOrEmpty(city))
+                throw new InvalidOperationException($"Configuration key '{cityConfigKey}' not specified.");
 
-        return city;
+            return city;
+        }
     }
 
     /// <summary>
     /// Retrieves the temperature unit configuration value from the application settings.
     /// </summary>
-    /// <returns>Returns the configured temperature unit of type <see cref="TemperatureUnit" />.</returns>
-    private TemperatureUnit GetTemperatureUnitFromConfiguration()
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <value>Returns the configured temperature unit of type <see cref="TemperatureUnit" />.</value>
+    private TemperatureUnit TemperatureUnit
     {
-        const string temperatureUnitKey = "TemperatureUnit";
-
-        if (string.IsNullOrEmpty(configuration.GetValue<String>(temperatureUnitKey)))
+        get
         {
-            throw new InvalidOperationException($"Configuration key '{temperatureUnitKey}' not specified.");
+            const string temperatureUnitKey = "TemperatureUnit";
+
+            if (string.IsNullOrEmpty(configuration.GetValue<String>(temperatureUnitKey)))
+            {
+                throw new InvalidOperationException($"Configuration key '{temperatureUnitKey}' not specified.");
+            }
+
+            var temperatureUnit = configuration.GetValue<TemperatureUnit>(temperatureUnitKey);
+
+            return temperatureUnit;
         }
-
-        var temperatureUnit = configuration.GetValue<TemperatureUnit>(temperatureUnitKey);
-
-        return temperatureUnit;
     }
 
     /// <summary>
@@ -87,10 +92,8 @@ public sealed class MainService(
             logger.LogWarning("Weather response does not contain necessary data");
             return;
         }
-        
-        var temperatureUnit = GetTemperatureUnitFromConfiguration();
 
-        LogWeather(weatherResponse, temperatureUnit);
+        LogWeather(weatherResponse, TemperatureUnit);
     }
 
     /// <summary>
@@ -98,6 +101,7 @@ public sealed class MainService(
     /// </summary>
     /// <param name="weatherResponse">The weather response data to be logged.</param>
     /// <param name="temperatureUnit">The unit in which the temperature should be logged (Celsius, Fahrenheit, or Kelvin).</param>
+    /// <exception cref="InvalidOperationException"></exception>
     private void LogWeather(WeatherResponse weatherResponse, TemperatureUnit temperatureUnit)
     {
         var temperature = TemperatureConverter.ConvertTemperature(
