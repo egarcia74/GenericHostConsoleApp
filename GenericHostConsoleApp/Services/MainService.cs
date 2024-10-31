@@ -72,6 +72,11 @@ public sealed class MainService(
         LogWeather(weatherResponse, temperatureUnit);
     }
 
+    /// <summary>
+    /// Logs the weather information based on the provided <see cref="WeatherResponse"/> and the specified <see cref="TemperatureUnit"/>.
+    /// </summary>
+    /// <param name="weatherResponse">The weather response object containing detailed weather information.</param>
+    /// <param name="temperatureUnit">The temperature unit in which the weather information should be logged (Celsius, Fahrenheit, Kelvin).</param>
     private void LogWeather(WeatherResponse weatherResponse, TemperatureUnit temperatureUnit)
     {
         var temperature = TemperatureConverter.ConvertTemperature(
