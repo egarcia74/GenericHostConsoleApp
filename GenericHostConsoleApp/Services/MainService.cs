@@ -46,10 +46,31 @@ public sealed class MainService(
     private string GetCityFromConfiguration()
     {
         const string cityConfigKey = "City";
+
         var city = configuration.GetValue<string>(cityConfigKey);
+
         if (string.IsNullOrEmpty(city))
             throw new InvalidOperationException($"Configuration key '{cityConfigKey}' not specified.");
+
         return city;
+    }
+
+    /// <summary>
+    /// Retrieves the temperature unit configuration value from the application settings.
+    /// </summary>
+    /// <returns>Returns the configured temperature unit of type <see cref="TemperatureUnit" />.</returns>
+    private TemperatureUnit GetTemperatureUnitFromConfiguration()
+    {
+        const string temperatureUnitKey = "TemperatureUnit";
+
+        if (string.IsNullOrEmpty(configuration.GetValue<String>(temperatureUnitKey)))
+        {
+            throw new InvalidOperationException($"Configuration key '{temperatureUnitKey}' not specified.");
+        }
+
+        var temperatureUnit = configuration.GetValue<TemperatureUnit>(temperatureUnitKey);
+
+        return temperatureUnit;
     }
 
     /// <summary>
@@ -66,8 +87,8 @@ public sealed class MainService(
             logger.LogWarning("Weather response does not contain necessary data");
             return;
         }
-
-        var temperatureUnit = configuration.GetValue<TemperatureUnit>("TemperatureUnit");
+        
+        var temperatureUnit = GetTemperatureUnitFromConfiguration();
 
         LogWeather(weatherResponse, temperatureUnit);
     }
