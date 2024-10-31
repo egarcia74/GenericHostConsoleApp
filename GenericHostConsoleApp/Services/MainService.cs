@@ -83,14 +83,14 @@ public sealed class MainService(
     ///     from Kelvin to Celsius and logging the information.
     /// </summary>
     /// <param name="weatherResponse">The weather response data containing the forecast details.</param>
+    /// <exception cref="InvalidOperationException">Weather response does not contain necessary data.</exception>
     private void ProcessWeatherForecast(WeatherResponse weatherResponse)
     {
         ArgumentNullException.ThrowIfNull(weatherResponse);
 
         if (weatherResponse.Main is null || weatherResponse.Weather is null || weatherResponse.Weather.Count == 0)
         {
-            logger.LogWarning("Weather response does not contain necessary data");
-            return;
+            throw new InvalidOperationException("Weather response does not contain necessary data.");
         }
 
         LogWeather(weatherResponse, TemperatureUnit);
@@ -101,7 +101,7 @@ public sealed class MainService(
     /// </summary>
     /// <param name="weatherResponse">The weather response data to be logged.</param>
     /// <param name="temperatureUnit">The unit in which the temperature should be logged (Celsius, Fahrenheit, or Kelvin).</param>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="InvalidOperationException">Unknown temperature unit.</exception>
     private void LogWeather(WeatherResponse weatherResponse, TemperatureUnit temperatureUnit)
     {
         var temperature = TemperatureConverter.ConvertTemperature(
