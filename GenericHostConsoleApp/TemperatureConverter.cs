@@ -11,6 +11,7 @@ public static class TemperatureConverter
     /// <param name="value">The temperature value to convert.</param>
     /// <param name="fromUnit">The unit of the temperature value to convert from.</param>
     /// <param name="toUnit">The unit of the temperature value to convert to.</param>
+    /// <exception cref="InvalidOperationException">Unsupported temperature conversion requested.</exception>
     /// <returns>The converted temperature value.</returns>
     public static double ConvertTemperature(double value, TemperatureUnit fromUnit, TemperatureUnit toUnit)
     {
