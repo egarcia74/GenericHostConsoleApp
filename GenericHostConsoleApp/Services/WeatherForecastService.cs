@@ -26,6 +26,7 @@ public class WeatherForecastService(
     /// </summary>
     /// <param name="city">The name of the city for which to fetch the weather forecast.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <exception cref="WeatherForecastException">WeatherForecastServiceOptions are not properly configured.</exception>
     /// <returns>A Task representing the asynchronous operation, which upon completion contains the weather forecast response.</returns>
     public async Task<WeatherResponse> FetchWeatherForecastAsync(string city, CancellationToken cancellationToken)
     {
@@ -33,7 +34,7 @@ public class WeatherForecastService(
 
         var url = $"{options.Value.Url}?q={city}&appid={options.Value.ApiKey}";
 
-        if (string.IsNullOrEmpty(options?.Value?.Url) || string.IsNullOrEmpty(options?.Value?.ApiKey))
+        if (string.IsNullOrEmpty(options.Value.Url) || string.IsNullOrEmpty(options.Value.ApiKey))
             throw new WeatherForecastException("WeatherForecastServiceOptions are not properly configured.");
 
         // Log the URL but obfuscate the key for security
