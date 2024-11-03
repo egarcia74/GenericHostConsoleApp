@@ -1,7 +1,7 @@
 {
     "configurations": [
         {
-            "name": "Run 'GenericHostConsoleApp' (Paris)",            
+            "name": "Run 'GenericHostConsoleApp' (Brisbane)",            
             "type": "dotnet",
             "workingDir": "$PROJECT_DIR$/GenericHostConsoleApp/bin/Debug/net8.0",
             "allowParallelRun": true,
