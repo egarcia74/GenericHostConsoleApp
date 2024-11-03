@@ -35,9 +35,9 @@ NOTES:
 }
 ```
 
-* To run, specify the City to get the weather forecast using the command line as follows:
+* To run, specify the name of the place to get the weather forecast using the command line as follows:
 ```
-dotnet run -- --city Berlin
+dotnet run -- --name Berlin
 ```
 
 [![.NET](https://github.com/egarcia74/GenericHostConsoleApp/actions/workflows/dotnet.yml/badge.svg)](https://github.com/egarcia74/GenericHostConsoleApp/actions/workflows/dotnet.yml)

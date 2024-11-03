@@ -7,7 +7,7 @@
             "allowParallelRun": true,
             "solutionPath": "$PROJECT_DIR$/GenericHostConsoleApp.sln",
             "projectPath": "$PROJECT_DIR$/GenericHostConsoleApp/GenericHostConsoleApp.csproj",
-            "args": ["-c", "Paris"]
+            "args": ["-n", "Brisbane"]
         }
     ]
 }
