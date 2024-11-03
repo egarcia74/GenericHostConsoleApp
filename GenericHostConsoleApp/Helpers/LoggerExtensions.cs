@@ -35,7 +35,7 @@ public static partial class LoggerExtensions
     ///     Logs a message indicating that the application is starting.
     /// </summary>
     /// <param name="logger">The <see cref="ILogger{TCategoryName}" /> to use.</param>
-    [LoggerMessage(3, LogLevel.Information, AppStartingMessage)]
+    [LoggerMessage(3, LogLevel.Debug, AppStartingMessage)]
     public static partial void LogApplicationStarting(this ILogger logger);
 
     /// <summary>
@@ -43,21 +43,21 @@ public static partial class LoggerExtensions
     /// </summary>
     /// <param name="logger">The <see cref="ILogger{TCategoryName}" /> to use.</param>
     /// <param name="args">The command line arguments.</param>
-    [LoggerMessage(4, LogLevel.Information, AppStartedMessage)]
+    [LoggerMessage(4, LogLevel.Debug, AppStartedMessage)]
     public static partial void LogApplicationStarted(this ILogger logger, string[] args);
 
     /// <summary>
     ///     Logs a message indicating that the application is stopping.
     /// </summary>
     /// <param name="logger">The <see cref="ILogger{TCategoryName}" /> to use.</param>
-    [LoggerMessage(5, LogLevel.Information, AppStoppingMessage)]
+    [LoggerMessage(5, LogLevel.Debug, AppStoppingMessage)]
     public static partial void LogApplicationStopping(this ILogger logger);
 
     /// <summary>
     ///     Logs a message indicating that the application has stopped.
     /// </summary>
     /// <param name="logger">The <see cref="ILogger{TCategoryName}" /> to use.</param>
-    [LoggerMessage(6, LogLevel.Information, AppStoppedMessage)]
+    [LoggerMessage(6, LogLevel.Debug, AppStoppedMessage)]
     public static partial void LogApplicationStopped(this ILogger logger);
 
     /// <summary>
@@ -66,7 +66,7 @@ public static partial class LoggerExtensions
     /// <param name="logger">The <see cref="ILogger{TCategoryName}" /> to use.</param>
     /// <param name="exitCode">The exit code as an enum.</param>
     /// <param name="exitCodeAsInt">The exit code as an integer.</param>
-    [LoggerMessage(7, LogLevel.Information, AppExitingMessage)]
+    [LoggerMessage(7, LogLevel.Debug, AppExitingMessage)]
     public static partial void LogApplicationExiting(this ILogger logger, ExitCode exitCode, int exitCodeAsInt);
 
     /// <summary>

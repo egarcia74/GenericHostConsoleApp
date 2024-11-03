@@ -38,7 +38,7 @@ public class WeatherForecastService(
             throw new WeatherForecastException("WeatherForecastServiceOptions are not properly configured.");
 
         // Log the URL but obfuscate the key for security
-        logger.LogInformation("OpenWeather Url: {Url}", url.Replace(options.Value.ApiKey, "*****"));
+        logger.LogDebug("OpenWeather Url: {Url}", url.Replace(options.Value.ApiKey, "*****"));
 
         var policyWrap = GetPolicy();
 
