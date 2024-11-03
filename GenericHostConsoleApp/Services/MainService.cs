@@ -47,12 +47,12 @@ public sealed class MainService(
         {
             const string nameKey = "Name";
 
-            var city = configuration.GetValue<string>(nameKey);
+            var name = configuration.GetValue<string>(nameKey);
 
-            if (string.IsNullOrEmpty(city))
+            if (string.IsNullOrEmpty(name))
                 throw new InvalidOperationException($"Configuration key '{nameKey}' not specified.");
 
-            return city;
+            return name;
         }
     }
 
