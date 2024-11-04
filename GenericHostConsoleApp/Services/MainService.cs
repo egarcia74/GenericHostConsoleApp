@@ -54,7 +54,7 @@ public sealed class MainService(
             var name = configuration.GetValue<string>(nameKey);
 
             if (string.IsNullOrEmpty(name))
-                throw new InvalidOperationException($"Configuration key '{nameKey}' not specified.");
+                throw new InvalidOperationException($"Configuration key '{nameKey}' not specified. Please specify a place name using --name \"Place Name\".");
 
             return name;
         }
