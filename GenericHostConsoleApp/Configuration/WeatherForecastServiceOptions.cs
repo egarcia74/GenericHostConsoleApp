@@ -12,11 +12,11 @@ public class WeatherForecastServiceOptions
     ///     Represents the API key used for authentication in the WeatherForecastService.
     /// </summary>
     [Required]
-    public string? ApiKey { get; set; }
+    public string? ApiKey { get; init; }
 
     /// <summary>
     ///     Represents the options for the WeatherForecastService.
     /// </summary>
     [Required]
-    public string? Url { get; set; }
+    public string? Url { get; init; }
 }
