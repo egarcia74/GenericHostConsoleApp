@@ -21,6 +21,8 @@ public sealed class MainService(
     /// <returns>Returns an <see cref="ExitCode" /> indicating the result of the execution.</returns>
     public async Task<ExitCode> ExecuteMainAsync(string[] args, CancellationToken cancellationToken)
     {
+#pragma warning disable CS0168
+        
         var weatherForecast = await weatherForecastService
             .FetchWeatherForecastAsync(Name, cancellationToken)
             .ConfigureAwait(false);
@@ -28,6 +30,8 @@ public sealed class MainService(
         ProcessWeatherForecast(weatherForecast);
 
         return ExitCode.Success;
+        
+#pragma warning restore CS0168
     }
 
     /// <summary>
