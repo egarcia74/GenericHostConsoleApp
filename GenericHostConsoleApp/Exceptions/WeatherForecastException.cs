@@ -3,6 +3,7 @@ namespace GenericHostConsoleApp.Exceptions;
 /// <summary>
 ///     Represents an exception that occurs during weather forecast retrieval.
 /// </summary>
+// ReSharper disable UnusedMember.Global
 public class WeatherForecastException : Exception
 {
     public WeatherForecastException()
