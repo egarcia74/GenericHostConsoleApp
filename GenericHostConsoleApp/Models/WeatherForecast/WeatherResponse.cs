@@ -3,11 +3,11 @@ using System.Text.Json.Serialization;
 namespace GenericHostConsoleApp.Models.WeatherForecast;
 
 // ReSharper disable once ClassNeverInstantiated.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 public class WeatherResponse
 {
     [JsonPropertyName("coord")] public Coordinates? Coord { get; init; }
-
-    // ReSharper disable once CollectionNeverUpdated.Global
     [JsonPropertyName("weather")] public List<Weather>? Weather { get; init; } = [];
 
     [JsonPropertyName("base")] public string? Base { get; init; }

@@ -5,6 +5,7 @@ namespace GenericHostConsoleApp.Configuration;
 /// <summary>
 ///     Represents the options for the WeatherForecastService.
 /// </summary>
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 public class WeatherForecastServiceOptions
 {
     /// <summary>
