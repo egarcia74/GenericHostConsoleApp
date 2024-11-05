@@ -14,27 +14,6 @@ public sealed class MainService(
     IWeatherForecastService weatherForecastService) : IMainService
 {
     /// <summary>
-    ///     Executes the main functionality of the application.
-    /// </summary>
-    /// <param name="args">An array of command-line arguments passed to the application.</param>
-    /// <param name="cancellationToken">A token that can be used to signal the operation should be canceled.</param>
-    /// <returns>Returns an <see cref="ExitCode" /> indicating the result of the execution.</returns>
-    public async Task<ExitCode> ExecuteMainAsync(string[] args, CancellationToken cancellationToken)
-    {
-#pragma warning disable CS0168
-        
-        var weatherForecast = await weatherForecastService
-            .FetchWeatherForecastAsync(Name, cancellationToken)
-            .ConfigureAwait(false);
-
-        ProcessWeatherForecast(weatherForecast);
-
-        return ExitCode.Success;
-        
-#pragma warning restore CS0168
-    }
-
-    /// <summary>
     ///     Retrieves the name of the city to get the weather for from the application's configuration.
     /// </summary>
     /// <value>
@@ -54,14 +33,15 @@ public sealed class MainService(
             var name = configuration.GetValue<string>(nameKey);
 
             if (string.IsNullOrEmpty(name))
-                throw new InvalidOperationException($"Configuration key '{nameKey}' not specified. Please specify a place name using --name \"Place Name\".");
+                throw new InvalidOperationException(
+                    $"Configuration key '{nameKey}' not specified. Please specify a place name using --name \"Place Name\".");
 
             return name;
         }
     }
 
     /// <summary>
-    /// Retrieves the temperature unit configuration value from the application settings.
+    ///     Retrieves the temperature unit configuration value from the application settings.
     /// </summary>
     /// <exception cref="InvalidOperationException"></exception>
     /// <value>Returns the configured temperature unit of type <see cref="TemperatureUnit" />.</value>
@@ -78,6 +58,27 @@ public sealed class MainService(
 
             return temperatureUnit;
         }
+    }
+
+    /// <summary>
+    ///     Executes the main functionality of the application.
+    /// </summary>
+    /// <param name="args">An array of command-line arguments passed to the application.</param>
+    /// <param name="cancellationToken">A token that can be used to signal the operation should be canceled.</param>
+    /// <returns>Returns an <see cref="ExitCode" /> indicating the result of the execution.</returns>
+    public async Task<ExitCode> ExecuteMainAsync(string[] args, CancellationToken cancellationToken)
+    {
+#pragma warning disable CS0168
+
+        var weatherForecast = await weatherForecastService
+            .FetchWeatherForecastAsync(Name, cancellationToken)
+            .ConfigureAwait(false);
+
+        ProcessWeatherForecast(weatherForecast);
+
+        return ExitCode.Success;
+
+#pragma warning restore CS0168
     }
 
     /// <summary>
