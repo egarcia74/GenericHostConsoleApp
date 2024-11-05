@@ -12,9 +12,14 @@ await Host.CreateDefaultBuilder(args)
     // Set the content root directory for the host instance.
     .UseContentRoot(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
                     ?? throw new InvalidOperationException("Failed to get the path to the current assembly."))
-    .ConfigureAppConfiguration((_, builder) =>
+    .ConfigureAppConfiguration((hostContext, builder) =>
     {
-        // Add user secrets to the configuration
+        // Add environment-specific configurations
+        builder
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+            .AddJsonFile($"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+
+    // Add user secrets to the configuration
         builder.AddUserSecrets<Program>(false, true);
 
         // Uncomment below code to add a command line configuration provider:
