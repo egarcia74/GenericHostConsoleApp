@@ -14,7 +14,7 @@ public sealed class MainService(
     IWeatherForecastService weatherForecastService) : IMainService
 {
     /// <summary>
-    ///     Retrieves the name of the city to get the weather for from the application's configuration.
+    ///     Retrieves the name of the place to get the weather for from the application's configuration.
     /// </summary>
     /// <value>
     ///     Returns the name as a string if it exists in the configuration; otherwise, throws an
