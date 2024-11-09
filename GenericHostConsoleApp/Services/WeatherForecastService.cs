@@ -22,17 +22,17 @@ public class WeatherForecastService(
     : IWeatherForecastService
 {
     /// <summary>
-    ///     Fetches the weather forecast for a specified city from an external API asynchronously.
+    ///     Fetches the weather forecast for a specified name from an external API asynchronously.
     /// </summary>
-    /// <param name="city">The name of the city for which to fetch the weather forecast.</param>
+    /// <param name="name">The name of the place for which to fetch the weather forecast.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <exception cref="WeatherForecastException">WeatherForecastServiceOptions are not properly configured.</exception>
     /// <returns>A Task representing the asynchronous operation, which upon completion contains the weather forecast response.</returns>
-    public async Task<WeatherResponse> FetchWeatherForecastAsync(string city, CancellationToken cancellationToken)
+    public async Task<WeatherResponse> FetchWeatherForecastAsync(string name, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var url = $"{options.Value.Url}?q={city}&appid={options.Value.ApiKey}";
+        var url = $"{options.Value.Url}?q={name}&appid={options.Value.ApiKey}";
 
         if (string.IsNullOrEmpty(options.Value.Url) || string.IsNullOrEmpty(options.Value.ApiKey))
             throw new WeatherForecastException("WeatherForecastServiceOptions are not properly configured.");
@@ -47,7 +47,7 @@ public class WeatherForecastService(
         if (!response.IsSuccessStatusCode)
         {
             if (response.StatusCode == HttpStatusCode.NotFound)
-                throw new WeatherForecastException($"The city \"{city}\" does not exist.");
+                throw new WeatherForecastException($"The name \"{name}\" was not found.");
 
             throw new WeatherForecastException(
                 $"Failed to fetch weather data: Status: {response.StatusCode}; {response.Content}");
