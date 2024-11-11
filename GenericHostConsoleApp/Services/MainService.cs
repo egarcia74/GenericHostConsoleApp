@@ -106,66 +106,30 @@ public sealed class MainService(
     /// <exception cref="InvalidOperationException">Unknown temperature unit.</exception>
     private void LogWeather(WeatherResponse weatherResponse, TemperatureUnit temperatureUnit)
     {
-        var temperature = TemperatureConverter.ConvertTemperature(
-            weatherResponse.Main!.Temp,
-            TemperatureUnit.Kelvin,
-            temperatureUnit);
+        var temperature = TemperatureConverter.ConvertTemperature(weatherResponse.Main!.Temp, TemperatureUnit.Kelvin, temperatureUnit);
+        var feelsLike = TemperatureConverter.ConvertTemperature(weatherResponse.Main.FeelsLike, TemperatureUnit.Kelvin, temperatureUnit);
+        var tempMin = TemperatureConverter.ConvertTemperature(weatherResponse.Main.TempMin, TemperatureUnit.Kelvin, temperatureUnit);
+        var tempMax = TemperatureConverter.ConvertTemperature(weatherResponse.Main.TempMax, TemperatureUnit.Kelvin, temperatureUnit);
 
-        var feelsLike = TemperatureConverter.ConvertTemperature(
-            weatherResponse.Main.FeelsLike,
-            TemperatureUnit.Kelvin,
-            temperatureUnit);
-
-        var tempMin = TemperatureConverter.ConvertTemperature(
-            weatherResponse.Main.TempMin,
-            TemperatureUnit.Kelvin,
-            temperatureUnit);
-
-        var tempMax = TemperatureConverter.ConvertTemperature(
-            weatherResponse.Main.TempMax,
-            TemperatureUnit.Kelvin,
-            temperatureUnit);
-
-        switch (temperatureUnit)
+        string unitSymbol = temperatureUnit switch
         {
-            case TemperatureUnit.Celsius:
-                logger.LogInformation(
-                    "Weather forecast for {Name}, {Country} is {Temperature:0}ºC (feels like {FeelsLike:0}ºC) Min {TempMin:0}ºC Max {TempMax:0}ºC {WeatherDescription}",
-                    weatherResponse.Name,
-                    weatherResponse.Sys?.Country,
-                    temperature,
-                    feelsLike,
-                    tempMin,
-                    tempMax,
-                    weatherResponse.Weather!.First().Description);
-                break;
+            TemperatureUnit.Celsius => "ºC",
+            TemperatureUnit.Fahrenheit => "ºF",
+            TemperatureUnit.Kelvin => "ºK",
+            _ => throw new InvalidOperationException($"Unknown temperature unit: {temperatureUnit}")
+        };
 
-            case TemperatureUnit.Fahrenheit:
-                logger.LogInformation(
-                    "Weather forecast for {Name}, {Country} is {Temperature:0}ºF (feels like {FeelsLike:0}ºF) Min {TempMin:0}ºF Max {TempMax:0}ºF {WeatherDescription}",
-                    weatherResponse.Name,
-                    weatherResponse.Sys?.Country,
-                    temperature,
-                    feelsLike,
-                    tempMin,
-                    tempMax,
-                    weatherResponse.Weather!.First().Description);
-                break;
-
-            case TemperatureUnit.Kelvin:
-                logger.LogInformation(
-                    "Weather forecast for {Name}, {Country} is {Temperature:0}ºK (feels like {FeelsLike:0}ºK) Min {TempMin:0}ºK Max {TempMax:0}ºK {WeatherDescription}",
-                    weatherResponse.Name,
-                    weatherResponse.Sys?.Country,
-                    temperature,
-                    feelsLike,
-                    tempMin,
-                    tempMax,
-                    weatherResponse.Weather!.First().Description);
-                break;
-
-            default:
-                throw new InvalidOperationException($"Unknown temperature unit: {temperatureUnit}");
-        }
-    }
-}
+        logger.LogInformation(
+            "Weather forecast for {Name}, {Country}: Temperature: {Temperature:0}{UnitSymbol} (feels like {FeelsLike:0}{UnitSymbol}), Min: {TempMin:0}{UnitSymbol}, Max: {TempMax:0}{UnitSymbol}. Weather: {WeatherDescription}",
+            weatherResponse.Name,
+            weatherResponse.Sys?.Country,
+            temperature,
+            unitSymbol,
+            feelsLike,
+            unitSymbol,
+            tempMin,
+            unitSymbol,
+            tempMax,
+            unitSymbol,
+            weatherResponse.Weather!.First().Description);
+    }}
