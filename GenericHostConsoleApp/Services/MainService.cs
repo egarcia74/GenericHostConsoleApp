@@ -24,21 +24,7 @@ public sealed class MainService(
     ///     Thrown when the name configuration key is not specified or the value is
     ///     empty.
     /// </exception>
-    private string Name
-    {
-        get
-        {
-            const string nameKey = "Name";
-
-            var name = configuration.GetValue<string>(nameKey);
-
-            if (string.IsNullOrEmpty(name))
-                throw new InvalidOperationException(
-                    $"Configuration key '{nameKey}' not specified. Please specify a place name using --name \"Place Name\".");
-
-            return name;
-        }
-    }
+    private string Name => GetConfigurationValue("Name");
 
     /// <summary>
     ///     Retrieves the temperature unit configuration value from the application settings.
@@ -49,14 +35,18 @@ public sealed class MainService(
     {
         get
         {
-            const string temperatureUnitKey = "TemperatureUnit";
+            const string key = "TemperatureUnit";
 
-            if (string.IsNullOrEmpty(configuration.GetValue<string>(temperatureUnitKey)))
-                throw new InvalidOperationException($"Configuration key '{temperatureUnitKey}' not specified.");
+            var temperatureUnit = configuration.GetValue<string>(key);
 
-            var temperatureUnit = configuration.GetValue<TemperatureUnit>(temperatureUnitKey);
+            if (string.IsNullOrEmpty(temperatureUnit))
+                throw new InvalidOperationException($"Configuration key '{key}' not specified or is empty.");
 
-            return temperatureUnit;
+            if (!Enum.TryParse<TemperatureUnit>(temperatureUnit, ignoreCase: true, out var decodedTemperatureUnit))
+                throw new InvalidOperationException(
+                    $"The value '{temperatureUnit}' for the key '{key}' is not a valid TemperatureUnit.");
+
+            return decodedTemperatureUnit;
         }
     }
 
@@ -68,8 +58,6 @@ public sealed class MainService(
     /// <returns>Returns an <see cref="ExitCode" /> indicating the result of the execution.</returns>
     public async Task<ExitCode> ExecuteMainAsync(string[] args, CancellationToken cancellationToken)
     {
-#pragma warning disable CS0168
-
         var weatherForecast = await weatherForecastService
             .FetchWeatherForecastAsync(Name, cancellationToken)
             .ConfigureAwait(false);
@@ -77,8 +65,23 @@ public sealed class MainService(
         ProcessWeatherForecast(weatherForecast);
 
         return ExitCode.Success;
+    }
 
-#pragma warning restore CS0168
+    /// <summary>
+    ///     Retrieves the value of a specified configuration key.
+    /// </summary>
+    /// <param name="key">The configuration key whose value needs to be retrieved.</param>
+    /// <returns>The value of the specified configuration key.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if the configuration key is not specified or the value is empty.</exception>
+    private string GetConfigurationValue(string key)
+    {
+        var value = configuration.GetValue<string>(key);
+
+        if (string.IsNullOrEmpty(value))
+            throw new InvalidOperationException(
+                $"Configuration key '{key}' not specified or is empty. Please specify a value for '{key}'.");
+
+        return value;
     }
 
     /// <summary>
@@ -106,12 +109,30 @@ public sealed class MainService(
     /// <exception cref="InvalidOperationException">Unknown temperature unit.</exception>
     private void LogWeather(WeatherResponse weatherResponse, TemperatureUnit temperatureUnit)
     {
-        var temperature = TemperatureConverter.ConvertTemperature(weatherResponse.Main!.Temp, TemperatureUnit.Kelvin, temperatureUnit);
-        var feelsLike = TemperatureConverter.ConvertTemperature(weatherResponse.Main.FeelsLike, TemperatureUnit.Kelvin, temperatureUnit);
-        var tempMin = TemperatureConverter.ConvertTemperature(weatherResponse.Main.TempMin, TemperatureUnit.Kelvin, temperatureUnit);
-        var tempMax = TemperatureConverter.ConvertTemperature(weatherResponse.Main.TempMax, TemperatureUnit.Kelvin, temperatureUnit);
+        var temperature =
+            TemperatureConverter.ConvertTemperature(
+                weatherResponse.Main!.Temp, 
+                TemperatureUnit.Kelvin,
+                temperatureUnit);
+        
+        var feelsLike = TemperatureConverter.ConvertTemperature(
+            weatherResponse.Main.FeelsLike, 
+            TemperatureUnit.Kelvin,
+            temperatureUnit);
+        
+        var tempMin =
+            TemperatureConverter.ConvertTemperature(
+                weatherResponse.Main.TempMin, 
+                TemperatureUnit.Kelvin,
+                temperatureUnit);
+        
+        var tempMax =
+            TemperatureConverter.ConvertTemperature(
+                weatherResponse.Main.TempMax, 
+                TemperatureUnit.Kelvin,
+                temperatureUnit);
 
-        string unitSymbol = temperatureUnit switch
+        var unitSymbol = temperatureUnit switch
         {
             TemperatureUnit.Celsius => "ºC",
             TemperatureUnit.Fahrenheit => "ºF",
@@ -121,8 +142,8 @@ public sealed class MainService(
 
         logger.LogInformation(
             "Weather forecast for {Name}, {Country}: Temperature: {Temperature:0}{UnitSymbol} (feels like {FeelsLike:0}{UnitSymbol}), Min: {TempMin:0}{UnitSymbol}, Max: {TempMax:0}{UnitSymbol}. Weather: {WeatherDescription}",
-            weatherResponse.Name,
-            weatherResponse.Sys?.Country,
+            weatherResponse.Name ?? "Unknown",
+            weatherResponse.Sys?.Country ?? "Unknown",
             temperature,
             unitSymbol,
             feelsLike,
@@ -131,5 +152,6 @@ public sealed class MainService(
             unitSymbol,
             tempMax,
             unitSymbol,
-            weatherResponse.Weather!.First().Description);
-    }}
+            weatherResponse.Weather?.First().Description);
+    }
+}

@@ -42,7 +42,7 @@ public class WeatherForecastService(
 
         var policyWrap = GetPolicy();
 
-        using var response = await policyWrap.ExecuteAsync(token => httpClient.GetAsync(url, token), cancellationToken);
+        using var response = await policyWrap.ExecuteAsync(token => httpClient.GetAsync(url, token), cancellationToken).ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
         {

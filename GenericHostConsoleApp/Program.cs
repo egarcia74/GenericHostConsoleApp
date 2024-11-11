@@ -16,10 +16,10 @@ await Host.CreateDefaultBuilder(args)
     {
         // Add environment-specific configurations
         builder
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-            .AddJsonFile($"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+            .AddJsonFile("appsettings.json", true, true)
+            .AddJsonFile($"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json", true, true);
 
-    // Add user secrets to the configuration
+        // Add user secrets to the configuration
         builder.AddUserSecrets<Program>(false, true);
 
         // Uncomment below code to add a command line configuration provider:
@@ -51,4 +51,5 @@ await Host.CreateDefaultBuilder(args)
             .ReadFrom.Configuration(context.Configuration))
 
     // Start the host instance as a console application.
-    .RunConsoleAsync();
+    .RunConsoleAsync()
+    .ConfigureAwait(false);
