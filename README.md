@@ -64,3 +64,6 @@ dotnet run -- --name Berlin
 ```
 
 [![.NET](https://github.com/egarcia74/GenericHostConsoleApp/actions/workflows/dotnet.yml/badge.svg)](https://github.com/egarcia74/GenericHostConsoleApp/actions/workflows/dotnet.yml)
+
+https://github.com/melnkovmaxim/Discord.Bot
+ * https://github.com/draghav/Airtek
