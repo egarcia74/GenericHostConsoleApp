@@ -42,6 +42,7 @@ using IHost host = Host.CreateDefaultBuilder(args)
     .Build();
 
 await host.RunAsync();
+```
 
 This code snippet sets up a Generic Host and adds a hosted service called ApplicationHostedService. This service will run in the background and perform tasks as defined in its implementation. You can reuse ApplicationHostedService to handle the application's lifecycle and background tasks.
 This example also demonstrates how to use dependency injection to inject the IMainService and IWeatherForecastService dependencies into the ApplicationHostedService.
