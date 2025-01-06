@@ -49,6 +49,5 @@ try
 }
 finally
 {
-    // Ensure the host is disposed
     Log.CloseAndFlush();
 }
