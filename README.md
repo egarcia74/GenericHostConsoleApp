@@ -1,7 +1,7 @@
 # GenericHostConsoleApp
 
 A console app example
-using [Host.CreateApplicationBuilder](https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.host.createapplicationbuilder?view=net-9.0-pp)).
+using [Host.CreateApplicationBuilder](https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.host.createapplicationbuilder?view=net-9.0-pp).
 
 This code is derived from [David Federman's](https://github.com/dfederm) original
 code: https://github.com/dfederm/GenericHostConsoleApp
