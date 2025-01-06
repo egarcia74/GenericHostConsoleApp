@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using GenericHostConsoleApp.Configuration;
+﻿using GenericHostConsoleApp.Configuration;
 using GenericHostConsoleApp.Services;
 using GenericHostConsoleApp.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -7,49 +6,56 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
-// Configure and start the application host. 
-await Host.CreateDefaultBuilder(args)
-    // Set the content root directory for the host instance.
-    .UseContentRoot(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
-                    ?? throw new InvalidOperationException("Failed to get the path to the current assembly."))
-    .ConfigureAppConfiguration((hostContext, builder) =>
-    {
-        // Add environment-specific configurations
-        builder
-            .AddJsonFile("appsettings.json", true, true)
-            .AddJsonFile($"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json", true, true);
+// Create the host builder
+var builder = Host.CreateApplicationBuilder(args);
 
-        // Add user secrets to the configuration
-        builder.AddUserSecrets<Program>(false, true);
+// Configure configuration sources
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddEnvironmentVariables();
 
-        // Uncomment below code to add a command line configuration provider:
-        builder.AddCommandLine(args, new Dictionary<string, string>
-        {
-            { "-n", "Name" },
-            { "--name", "Name" }
-        });
-    })
-    .ConfigureServices((hostContext, services) =>
-    {
-        // Add the needed services
-        services
-            .AddHostedService<ApplicationHostedService>()
-            .AddTransient<IMainService, MainService>()
-            .AddTransient<IWeatherForecastService, WeatherForecastService>()
-            .AddHttpClient<WeatherForecastService>();
+// Add command-line arguments with mappings
+builder.Configuration.AddCommandLine(args, new Dictionary<string, string>
+{
+    { "-n", "Name" },
+    { "--name", "Name" }
+});
 
-        // Set up the application options.
-        services
-            .AddOptions<WeatherForecastServiceOptions>()
-            .Bind(hostContext.Configuration.GetSection(nameof(WeatherForecastServiceOptions)))
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-    })
-    // Add logging capabilities
-    .UseSerilog((context, configuration) =>
-        configuration
-            .ReadFrom.Configuration(context.Configuration))
+// Configure logging
+builder.Services
+    .AddSerilog((_, configuration) => configuration
+    .ReadFrom.Configuration(builder.Configuration) 
+    .Enrich.FromLogContext()
+    .WriteTo.Console());
 
-    // Start the host instance as a console application.
-    .RunConsoleAsync()
-    .ConfigureAwait(false);
+// Configure services
+builder.Services.AddHostedService<ApplicationHostedService>();
+builder.Services.AddTransient<IMainService, MainService>();
+builder.Services.AddTransient<IWeatherForecastService, WeatherForecastService>();
+builder.Services.AddHttpClient<WeatherForecastService>();
+
+// Configure options and validation
+builder.Services
+    .AddOptions<WeatherForecastServiceOptions>()
+    .Bind(builder.Configuration.GetSection(nameof(WeatherForecastServiceOptions)))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+// Build and run the host
+using var host = builder.Build();
+
+try
+{
+    await host.RunAsync();
+}
+catch (Exception ex)
+{
+    // Log the exception and rethrow it
+    Log.Fatal(ex, "Host terminated unexpectedly");
+    throw;
+}
+finally
+{
+    // Ensure the host is disposed
+    Log.CloseAndFlush();
+}
