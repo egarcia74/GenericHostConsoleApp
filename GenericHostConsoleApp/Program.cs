@@ -4,6 +4,7 @@ using GenericHostConsoleApp.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Serilog;
 
 // Create the host builder
@@ -22,11 +23,9 @@ builder.Configuration.AddCommandLine(args, new Dictionary<string, string>
 });
 
 // Configure logging
-builder.Services
-    .AddSerilog((_, configuration) => configuration
-    .ReadFrom.Configuration(builder.Configuration) 
-    .Enrich.FromLogContext()
-    .WriteTo.Console());
+builder.Logging.ClearProviders(); // Remove default providers
+builder.Services.AddSerilog((_, configuration) => 
+        configuration.ReadFrom.Configuration(builder.Configuration));
 
 // Configure services
 builder.Services.AddHostedService<ApplicationHostedService>();
@@ -47,12 +46,6 @@ using var host = builder.Build();
 try
 {
     await host.RunAsync();
-}
-catch (Exception ex)
-{
-    // Log the exception and rethrow it
-    Log.Fatal(ex, "Host terminated unexpectedly");
-    throw;
 }
 finally
 {
