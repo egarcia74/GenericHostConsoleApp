@@ -1,7 +1,7 @@
 # GenericHostConsoleApp
 
 A console app example
-using [.NET Generic Host](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host).
+using [Host.CreateApplicationBuilder](https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.host.createapplicationbuilder?view=net-9.0-pp)).
 
 This code is derived from [David Federman's](https://github.com/dfederm) original
 code: https://github.com/dfederm/GenericHostConsoleApp
@@ -24,33 +24,72 @@ This version adds a few extra bells and whistles such as:
 * Unit tests using xUnit and Moq.
 * This reference implementation uses a weather forecast service that fetches the weather from [Open Weather](https://openweathermap.org).
 
-## Registering the ApplicationHostedService and its dependencies
-
-This project demonstrates how to use the .NET Generic Host to create a long-running console application. Here's a basic example of how to get started:
+## Program.cs
 
 ```C#
-using Microsoft.Extensions.Hosting;
+using GenericHostConsoleApp.Configuration;
+using GenericHostConsoleApp.Services;
+using GenericHostConsoleApp.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
-using IHost host = Host.CreateDefaultBuilder(args)
-    .ConfigureServices(services =>
-    {
-        services.AddHostedService<ApplicationHostedService>();
-        services.AddTransient<IMainService, MainService>(); 
-        services.AddTransient<IWeatherForecastService, WeatherForecastService>();
-    })
-    .Build();
+// Create the host builder
+var builder = Host.CreateApplicationBuilder(args);
 
-await host.RunAsync();
+// Configure configuration sources
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddEnvironmentVariables();
+
+// Add command-line arguments with mappings
+builder.Configuration.AddCommandLine(args, new Dictionary<string, string>
+{
+    { "-n", "Name" },
+    { "--name", "Name" }
+});
+
+// Configure logging
+builder.Logging.ClearProviders(); // Remove default providers
+builder.Services.AddSerilog((_, configuration) => 
+        configuration.ReadFrom.Configuration(builder.Configuration));
+
+// Configure services
+builder.Services.AddHostedService<ApplicationHostedService>();
+builder.Services.AddTransient<IMainService, MainService>();
+builder.Services.AddTransient<IWeatherForecastService, WeatherForecastService>();
+builder.Services.AddHttpClient<WeatherForecastService>();
+
+// Configure options and validation
+builder.Services
+    .AddOptions<WeatherForecastServiceOptions>()
+    .Bind(builder.Configuration.GetSection(nameof(WeatherForecastServiceOptions)))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+// Build and run the host
+using var host = builder.Build();
+
+try
+{
+    await host.RunAsync();
+}
+finally
+{
+    // Ensure the host is disposed
+    Log.CloseAndFlush();
+}
 ```
 
-This code snippet sets up a Generic Host and adds a hosted service called ApplicationHostedService. This service will run in the background and perform tasks as defined in its implementation. You can reuse ApplicationHostedService to handle the application's lifecycle and background tasks.
+This code snippet sets up a HostApplicationBuilder and adds a hosted service called ApplicationHostedService. This service will run in the background and perform tasks as defined in its implementation. You can reuse ApplicationHostedService to handle the application's lifecycle and background tasks.
 This example also demonstrates how to use dependency injection to inject the IMainService and IWeatherForecastService dependencies into the ApplicationHostedService.
 Running the Application
 
 ## Implementing the main application logic in IMainService.ExecuteMainAsync
 
-The MainService class contains the main application logic. Here's an example of what the ExecuteMainAsync method might look like:
+The MainService class contains the main application logic. Here's an example of what the IMainService.ExecuteMainAsync method might look like:
 
 ```C#
 public async Task ExecuteMainAsync(string[] args)
@@ -68,7 +107,7 @@ public async Task ExecuteMainAsync(string[] args)
 This method retrieves the weather forecast from the IWeatherForecastService, logs it, and then performs some action with the data. You can modify this method to implement your own application logic.
 
 ## Notes:
-* Be sure to specify your [Open Weather](https://openweathermap.org) API key in a .NET User Secrets file:
+* When you run the project in the Development environment (`DOTNET_ENVIRONMENT=Development`), be sure to specify your [Open Weather](https://openweathermap.org) API key in a .NET User Secrets file.
 
 ```
 {
@@ -76,6 +115,12 @@ This method retrieves the weather forecast from the IWeatherForecastService, log
     "ApiKey": "123456789123456789"
   }
 }
+```
+
+When running in the Production environment (`DOTNET_ENVIRONMENT=Production`), you can specify the API key by setting the following environment variable:
+
+```
+WeatherForecastServiceOptions__ApiKey=123456789123456789
 ```
 
 * To run, specify the name of the place to get the weather forecast using the command line as follows:
