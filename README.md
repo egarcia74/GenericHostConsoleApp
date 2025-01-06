@@ -24,7 +24,7 @@ This version adds a few extra bells and whistles such as:
 * Unit tests using xUnit and Moq.
 * This reference implementation uses a weather forecast service that fetches the weather from [Open Weather](https://openweathermap.org).
 
-## Example Usage
+## Registering the ApplicationHostedService and its dependencies
 
 This project demonstrates how to use the .NET Generic Host to create a long-running console application. Here's a basic example of how to get started:
 
@@ -48,7 +48,26 @@ This code snippet sets up a Generic Host and adds a hosted service called Applic
 This example also demonstrates how to use dependency injection to inject the IMainService and IWeatherForecastService dependencies into the ApplicationHostedService.
 Running the Application
 
-Notes:
+## Implementing the main application logic in IMainService.ExecuteMainAsync
+
+The MainService class contains the main application logic. Here's an example of what the ExecuteMainAsync method might look like:
+
+```C#
+public async Task ExecuteMainAsync(string[] args)
+{
+    // 1. Get the weather forecast
+    var weatherForecast = await _weatherForecastService.GetWeatherForecastAsync(args);
+
+    // 2. Log the weather forecast
+    _logger.LogInformation("Weather forecast for {City}: {Forecast}", args[0], weatherForecast);
+
+    // 3. Do something with the weather forecast...
+}
+```
+
+This method retrieves the weather forecast from the IWeatherForecastService, logs it, and then performs some action with the data. You can modify this method to implement your own application logic.
+
+## Notes:
 * Be sure to specify your [Open Weather](https://openweathermap.org) API key in a .NET User Secrets file:
 
 ```
