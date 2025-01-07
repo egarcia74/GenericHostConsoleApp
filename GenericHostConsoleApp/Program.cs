@@ -11,9 +11,7 @@ using Serilog;
 var builder = Host.CreateApplicationBuilder(args);
 
 // Configure configuration sources
-builder.Configuration
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddEnvironmentVariables();
+builder.Configuration.AddEnvironmentVariables();
 
 // Add command-line arguments with mappings
 builder.Configuration.AddCommandLine(args, new Dictionary<string, string>
