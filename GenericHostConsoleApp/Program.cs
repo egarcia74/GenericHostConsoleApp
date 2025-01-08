@@ -1,4 +1,6 @@
-﻿using GenericHostConsoleApp.Configuration;
+﻿using GenericHostConsoleApp;
+using GenericHostConsoleApp.Configuration;
+using GenericHostConsoleApp.HttpClient;
 using GenericHostConsoleApp.Services;
 using GenericHostConsoleApp.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -22,14 +24,16 @@ builder.Configuration.AddCommandLine(args, new Dictionary<string, string>
 
 // Configure logging
 builder.Logging.ClearProviders(); // Remove default providers
-builder.Services.AddSerilog((_, configuration) => 
-        configuration.ReadFrom.Configuration(builder.Configuration));
+builder.Services.AddSerilog((_, configuration) =>
+    configuration.ReadFrom.Configuration(builder.Configuration));
 
 // Configure services
 builder.Services.AddHostedService<ApplicationHostedService>();
 builder.Services.AddTransient<IMainService, MainService>();
 builder.Services.AddTransient<IWeatherForecastService, WeatherForecastService>();
-builder.Services.AddHttpClient<WeatherForecastService>();
+
+// Register HttpClients with policies, passing the Configuration
+builder.Services.AddHttpClientsWithPolicies(builder.Configuration);
 
 // Configure options and validation
 builder.Services

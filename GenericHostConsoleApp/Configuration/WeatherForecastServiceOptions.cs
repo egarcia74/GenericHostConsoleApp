@@ -13,10 +13,4 @@ public record WeatherForecastServiceOptions
     /// </summary>
     [Required]
     public required string ApiKey { get; init; }
-
-    /// <summary>
-    ///     Represents the options for the WeatherForecastService.
-    /// </summary>
-    [Required]
-    public required string Url { get; init; }
 }

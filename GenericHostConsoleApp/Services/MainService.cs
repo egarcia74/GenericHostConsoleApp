@@ -42,7 +42,7 @@ public sealed class MainService(
             if (string.IsNullOrEmpty(temperatureUnit))
                 throw new InvalidOperationException($"Configuration key '{key}' not specified or is empty.");
 
-            if (!Enum.TryParse<TemperatureUnit>(temperatureUnit, ignoreCase: true, out var decodedTemperatureUnit))
+            if (!Enum.TryParse<TemperatureUnit>(temperatureUnit, true, out var decodedTemperatureUnit))
                 throw new InvalidOperationException(
                     $"The value '{temperatureUnit}' for the key '{key}' is not a valid TemperatureUnit.");
 
@@ -111,24 +111,24 @@ public sealed class MainService(
     {
         var temperature =
             TemperatureConverter.ConvertTemperature(
-                weatherResponse.Main!.Temp, 
+                weatherResponse.Main!.Temp,
                 TemperatureUnit.Kelvin,
                 temperatureUnit);
-        
+
         var feelsLike = TemperatureConverter.ConvertTemperature(
-            weatherResponse.Main.FeelsLike, 
+            weatherResponse.Main.FeelsLike,
             TemperatureUnit.Kelvin,
             temperatureUnit);
-        
+
         var tempMin =
             TemperatureConverter.ConvertTemperature(
-                weatherResponse.Main.TempMin, 
+                weatherResponse.Main.TempMin,
                 TemperatureUnit.Kelvin,
                 temperatureUnit);
-        
+
         var tempMax =
             TemperatureConverter.ConvertTemperature(
-                weatherResponse.Main.TempMax, 
+                weatherResponse.Main.TempMax,
                 TemperatureUnit.Kelvin,
                 temperatureUnit);
 
@@ -141,6 +141,7 @@ public sealed class MainService(
         };
 
         logger.LogInformation(
+            // ReSharper disable TemplateDuplicatePropertyProblem
             "Weather forecast for {Name}, {Country}: Temperature: {Temperature:0}{UnitSymbol} (feels like {FeelsLike:0}{UnitSymbol}), Min: {TempMin:0}{UnitSymbol}, Max: {TempMax:0}{UnitSymbol}. Weather: {WeatherDescription}",
             weatherResponse.Name ?? "Unknown",
             weatherResponse.Sys?.Country ?? "Unknown",

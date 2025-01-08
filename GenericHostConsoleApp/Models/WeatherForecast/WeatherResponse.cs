@@ -9,7 +9,7 @@ namespace GenericHostConsoleApp.Models.WeatherForecast;
 public record WeatherResponse
 {
     [JsonPropertyName("coord")] public Coordinates? Coord { get; init; }
-    
+
     [JsonPropertyName("weather")] public List<Weather>? Weather { get; init; }
 
     [JsonPropertyName("base")] public string? Base { get; init; }

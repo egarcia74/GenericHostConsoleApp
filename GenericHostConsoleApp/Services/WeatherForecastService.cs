@@ -2,13 +2,12 @@ using System.Net;
 using System.Text.Json;
 using GenericHostConsoleApp.Configuration;
 using GenericHostConsoleApp.Exceptions;
+using GenericHostConsoleApp.HttpClient;
 using GenericHostConsoleApp.Models.WeatherForecast;
 using GenericHostConsoleApp.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Polly;
-using Polly.Timeout;
-using Polly.Wrap;
 
 namespace GenericHostConsoleApp.Services;
 
@@ -16,9 +15,9 @@ namespace GenericHostConsoleApp.Services;
 ///     A service for fetching weather forecasts from an external API.
 /// </summary>
 public class WeatherForecastService(
-    HttpClient httpClient,
     IOptions<WeatherForecastServiceOptions> options,
-    ILogger<WeatherForecastService> logger)
+    ILogger<WeatherForecastService> logger,
+    IHttpClientFactory httpClientFactory)
     : IWeatherForecastService
 {
     /// <summary>
@@ -32,17 +31,22 @@ public class WeatherForecastService(
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var url = $"{options.Value.Url}?q={name}&appid={options.Value.ApiKey}";
+        var httpClientName = HttpClientName.OpenWeather.ToString();
+        var httpClient = httpClientFactory.CreateClient(httpClientName);
 
-        if (string.IsNullOrEmpty(options.Value.Url) || string.IsNullOrEmpty(options.Value.ApiKey))
-            throw new WeatherForecastException("WeatherForecastServiceOptions are not properly configured.");
+        const string relativePath = "/data/2.5/weather";
+
+        var uriBuilder = new UriBuilder(new Uri(httpClient.BaseAddress!, relativePath))
+        {
+            Query = $"q={name}&appid={options.Value.ApiKey}"
+        };
+
+        var openWeatherUrl = uriBuilder.ToString();
 
         // Log the URL but obfuscate the key for security
-        logger.LogDebug("OpenWeather Url: {Url}", url.Replace(options.Value.ApiKey, "*****"));
+        logger.LogDebug("OpenWeather Url: {Url}", openWeatherUrl.Replace(options.Value.ApiKey, "*****"));
 
-        var policyWrap = GetPolicy();
-
-        using var response = await policyWrap.ExecuteAsync(token => httpClient.GetAsync(url, token), cancellationToken).ConfigureAwait(false);
+        using var response = await httpClient.GetAsync(openWeatherUrl, cancellationToken).ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -67,46 +71,5 @@ public class WeatherForecastService(
         {
             throw new WeatherForecastException("Failed to parse weather data.", ex);
         }
-    }
-
-    /// <summary>
-    ///     Retrieves the policy for handling retries, circuit breaking, and timeouts in the weather forecast service.
-    /// </summary>
-    /// <returns>
-    ///     The policy wrap that combines the retry, circuit breaker, and timeout policies.
-    /// </returns>
-    private AsyncPolicyWrap GetPolicy()
-    {
-        var retryPolicy = Policy
-            .Handle<HttpRequestException>()
-            .WaitAndRetryAsync(6,
-                retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
-                (exception, retryCount, context) =>
-                {
-                    // ReSharper disable once ExceptionPassedAsTemplateArgumentProblem
-                    logger.LogWarning("Retry {RetryCount} for policy: {ContextPolicyKey}, due to: {Exception}",
-                        retryCount, context.PolicyKey, exception);
-                });
-
-        var circuitBreakerPolicy = Policy
-            .Handle<HttpRequestException>()
-            .CircuitBreakerAsync(5, TimeSpan.FromMinutes(1),
-                (exception, breakDelay) =>
-                    logger.LogWarning("Circuit breaker opened due to: {Exception}. Break for: {BreakDelay}", exception,
-                        breakDelay),
-                () => logger.LogInformation("Circuit breaker reset"));
-
-        var timeoutPolicy = Policy.TimeoutAsync(30,
-            TimeoutStrategy.Optimistic, // More appropriate for HttpClient
-            (context, timeSpan, _) =>
-            {
-                logger.LogWarning(
-                    "Timeout from policy: {ContextPolicyKey} after waiting {TimeSpanTotalSeconds} seconds",
-                    context.PolicyKey, timeSpan.TotalSeconds);
-
-                return Task.CompletedTask;
-            });
-
-        return Policy.WrapAsync(retryPolicy, circuitBreakerPolicy, timeoutPolicy);
     }
 }
