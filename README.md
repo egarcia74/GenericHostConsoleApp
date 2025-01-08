@@ -132,5 +132,9 @@ If you want to use .NET User Secrets, you might want to specify the environment 
 dotnet run --environment "Development" -- --name Berlin
 ```
 
+The output should look as follows:
+```
+[01/08/2025 21:18:28 +10:00 Information] Weather forecast for "Berlin", "DE": Temperature: 4"ºC" (feels like -1"ºC"), Min: 2"ºC", Max: 4"ºC". Weather: "few clouds" {SourceContext="GenericHostConsoleApp.Services.MainService", ThreadId=10}
+```
 
 [![.NET](https://github.com/egarcia74/GenericHostConsoleApp/actions/workflows/dotnet.yml/badge.svg)](https://github.com/egarcia74/GenericHostConsoleApp/actions/workflows/dotnet.yml)
