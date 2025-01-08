@@ -106,7 +106,7 @@ This method retrieves the weather forecast from the IWeatherForecastService, log
 ## Notes:
 * When you run the project in the Development environment (`DOTNET_ENVIRONMENT=Development`), be sure to specify your [Open Weather](https://openweathermap.org) API key in a .NET User Secrets file.
 
-```
+```json
 {
   "WeatherForecastServiceOptions": {
     "ApiKey": "123456789123456789"
@@ -116,19 +116,19 @@ This method retrieves the weather forecast from the IWeatherForecastService, log
 
 When running in the Production environment (`DOTNET_ENVIRONMENT=Production`), you can specify the API key by setting the following environment variable:
 
-```
+```bash
 WeatherForecastServiceOptions__ApiKey=123456789123456789
 ```
 
 * To run, specify the name of the place to get the weather forecast using the command line as follows:
 
-```
+```bash
 dotnet run -- --name Berlin
 ```
 
 If you want to use .NET User Secrets, you might want to specify the environment name either via the DOTNET_ENVIRONMENT variable, or via the --environment option of dotnet:
 
-```
+```bash
 dotnet run --environment "Development" -- --name Berlin
 ```
 
