@@ -5,7 +5,7 @@ namespace GenericHostConsoleApp.Models.WeatherForecast;
 // ReSharper disable once ClassNeverInstantiated.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
-public class Coordinates
+public record Coordinates
 {
     [JsonPropertyName("lon")] public double Lon { get; init; }
 
