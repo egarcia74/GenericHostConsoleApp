@@ -6,17 +6,17 @@ namespace GenericHostConsoleApp.Configuration;
 ///     Represents the options for the WeatherForecastService.
 /// </summary>
 // ReSharper disable UnusedAutoPropertyAccessor.Global
-public class WeatherForecastServiceOptions
+public record WeatherForecastServiceOptions
 {
     /// <summary>
     ///     Represents the API key used for authentication in the WeatherForecastService.
     /// </summary>
     [Required]
-    public string? ApiKey { get; init; }
+    public required string ApiKey { get; init; }
 
     /// <summary>
     ///     Represents the options for the WeatherForecastService.
     /// </summary>
     [Required]
-    public string? Url { get; init; }
+    public required string Url { get; init; }
 }
