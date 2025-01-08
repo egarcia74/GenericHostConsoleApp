@@ -7,7 +7,7 @@ namespace GenericHostConsoleApp.HttpClient;
 /// <summary>
 /// Provides a set of Polly-based policies for handling transient errors, implementing circuit breaker patterns, and managing timeouts in HTTP-based operations.
 /// </summary>
-public static class HttpPolicy
+public static class HttpClientPolicy
 {
     /// <summary>
     /// Creates and returns a Polly retry policy for handling transient HTTP errors.

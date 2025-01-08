@@ -51,9 +51,9 @@ public static class HttpClientConfiguration
                 client.BaseAddress = new Uri(baseAddress);
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             })
-            .AddPolicyHandler(HttpPolicy.GetRetryPolicy())
-            .AddPolicyHandler(HttpPolicy.GetCircuitBreakerPolicy())
-            .AddPolicyHandler(HttpPolicy.GetTimeoutPolicy(TimeSpan.FromSeconds(10)));
+            .AddPolicyHandler(HttpClientPolicy.GetRetryPolicy())
+            .AddPolicyHandler(HttpClientPolicy.GetCircuitBreakerPolicy())
+            .AddPolicyHandler(HttpClientPolicy.GetTimeoutPolicy(TimeSpan.FromSeconds(10)));
 
         return services;
     }
