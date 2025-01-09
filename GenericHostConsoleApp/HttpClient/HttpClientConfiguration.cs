@@ -39,7 +39,7 @@ public static class HttpClientConfiguration
         IConfiguration configuration)
     {
         // Retrieve the BaseAddress for OpenWeatherHttpClient from the configuration
-        var clientName = HttpClientName.OpenWeather.ToString();
+        const string clientName = nameof(HttpClientName.OpenWeather);
         var baseAddress = configuration[$"HttpClients:{clientName}:BaseAddress"];
 
         if (string.IsNullOrWhiteSpace(baseAddress))

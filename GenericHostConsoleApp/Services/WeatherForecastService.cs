@@ -31,7 +31,7 @@ public class WeatherForecastService(
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var httpClientName = HttpClientName.OpenWeather.ToString();
+        const string httpClientName = nameof(HttpClientName.OpenWeather);
         var httpClient = httpClientFactory.CreateClient(httpClientName);
 
         const string relativePath = "/data/2.5/weather";
