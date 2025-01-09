@@ -1,4 +1,4 @@
-namespace GenericHostConsoleApp;
+namespace GenericHostConsoleApp.Helpers;
 
 /// <summary>
 ///     Represents the unit of temperature measurement.

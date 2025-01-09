@@ -1,3 +1,4 @@
+using GenericHostConsoleApp.Helpers;
 using GenericHostConsoleApp.Models.WeatherForecast;
 using GenericHostConsoleApp.Services.Interfaces;
 using Microsoft.Extensions.Configuration;

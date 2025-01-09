@@ -1,4 +1,4 @@
-namespace GenericHostConsoleApp;
+namespace GenericHostConsoleApp.Helpers;
 
 /// <summary>
 ///     A static utility class for converting temperature values between different units.
