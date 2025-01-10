@@ -1,5 +1,4 @@
-﻿using GenericHostConsoleApp;
-using GenericHostConsoleApp.Configuration;
+﻿using GenericHostConsoleApp.Configuration;
 using GenericHostConsoleApp.HttpClient;
 using GenericHostConsoleApp.Services;
 using GenericHostConsoleApp.Services.Interfaces;

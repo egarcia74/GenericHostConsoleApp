@@ -23,7 +23,7 @@ public static class HttpClientConfiguration
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.ConfigureOpenWeatherHttpClient(configuration);
+        services.AddOpenWeatherHttpClient(configuration);
 
         return services;
     }
@@ -34,7 +34,8 @@ public static class HttpClientConfiguration
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> to which the OpenWeather HTTP client is added.</param>
     /// <param name="configuration">The <see cref="IConfiguration"/> used to retrieve the base address for the HTTP client.</param>
-    private static IServiceCollection ConfigureOpenWeatherHttpClient(
+    /// <returns>The same <see cref="IServiceCollection"/> instance to allow method chaining.</returns>
+    private static IServiceCollection AddOpenWeatherHttpClient(
         this IServiceCollection services,
         IConfiguration configuration)
     {

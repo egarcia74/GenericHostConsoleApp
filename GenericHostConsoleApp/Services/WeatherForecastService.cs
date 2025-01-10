@@ -5,7 +5,6 @@ using GenericHostConsoleApp.Exceptions;
 using GenericHostConsoleApp.HttpClient;
 using GenericHostConsoleApp.Models.WeatherForecast;
 using GenericHostConsoleApp.Services.Interfaces;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
