@@ -83,17 +83,21 @@ public static class HttpClientConfiguration
                     logger.LogWarning(
                         "Policy {ContextPolicyKey} circuit broken for {TotalSeconds} seconds due to: {ExceptionMessage}",
                         context.PolicyKey, timeSpan.TotalSeconds, response.Exception.Message);
-                }, context => { logger.LogInformation("Policy {ContextPolicyKey} circuit reset", context.PolicyKey); }))
-            .AddPolicyHandler(HttpClientPolicy.GetTimeoutPolicy(
-                timeout, 
-                fallbackAction: _ =>
-            {
-                logger.LogWarning("Request timed out after {TotalSeconds}", timeout.TotalSeconds);
-                return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.RequestTimeout)
+                },
+                onReset: context =>
                 {
-                    Content = new StringContent("The request timed out.")
-                });
-            }));
+                    logger.LogInformation("Policy {ContextPolicyKey} circuit reset", context.PolicyKey);
+                }))
+            .AddPolicyHandler(HttpClientPolicy.GetTimeoutPolicy(
+                timeout,
+                fallbackAction: _ =>
+                {
+                    logger.LogWarning("Request timed out after {TotalSeconds}", timeout.TotalSeconds);
+                    return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.RequestTimeout)
+                    {
+                        Content = new StringContent("The request timed out.")
+                    });
+                }));
 
         return services;
     }
