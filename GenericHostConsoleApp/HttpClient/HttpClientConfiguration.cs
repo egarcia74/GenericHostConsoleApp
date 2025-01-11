@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace GenericHostConsoleApp.HttpClient;
 
@@ -41,10 +42,26 @@ public static class HttpClientConfiguration
     {
         // Retrieve the BaseAddress for OpenWeatherHttpClient from the configuration
         const string clientName = nameof(HttpClientName.OpenWeather);
-        var baseAddress = configuration[$"HttpClients:{clientName}:BaseAddress"];
+
+        var baseAddress = configuration.GetValue<string>($"HttpClients:{clientName}:BaseAddress");
 
         if (string.IsNullOrWhiteSpace(baseAddress))
             throw new ArgumentNullException(nameof(configuration), $"{clientName} BaseAddress is not configured.");
+
+        var retries = configuration.GetValue<int?>($"HttpClients:{clientName}:Retries") ?? 5;
+
+        var handledEventsBeforeBreaking =
+            configuration.GetValue<int?>($"HttpClients:{clientName}:EventsBeforeBreaking") ?? 5;
+
+        var durationOfBreak =
+            configuration.GetValue<TimeSpan?>($"HttpClients:{clientName}:DurationOfBreak") ??
+            TimeSpan.FromMinutes(5);
+
+        var timeout =
+            configuration.GetValue<TimeSpan?>($"HttpClients:{clientName}:Timeout") ??
+            TimeSpan.FromMinutes(5);
+
+        var logger = services.BuildServiceProvider().GetRequiredService<ILogger<System.Net.Http.HttpClient>>();
 
         services
             .AddHttpClient(clientName, client =>
@@ -52,9 +69,31 @@ public static class HttpClientConfiguration
                 client.BaseAddress = new Uri(baseAddress);
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             })
-            .AddPolicyHandler(HttpClientPolicy.GetRetryPolicy())
-            .AddPolicyHandler(HttpClientPolicy.GetCircuitBreakerPolicy())
-            .AddPolicyHandler(HttpClientPolicy.GetTimeoutPolicy(TimeSpan.FromSeconds(10)));
+            .AddPolicyHandler(HttpClientPolicy.GetRetryPolicy(
+                retries,
+                sleepDurationProvider: (outcome, timespan, retryAttempt, context) =>
+                {
+                    logger.LogWarning(
+                        "Policy {ContextPolicyKey} retry {RetryAttempt} for {ClientName}. Waiting {TotalSeconds} seconds. Exception: {ExceptionMessage}",
+                        context.PolicyKey, retryAttempt, clientName, timespan.TotalSeconds, outcome.Exception?.Message);
+                }))
+            .AddPolicyHandler(HttpClientPolicy.GetCircuitBreakerPolicy(handledEventsBeforeBreaking, durationOfBreak,
+                onBreak: (response, timeSpan, context) =>
+                {
+                    logger.LogWarning(
+                        "Policy {ContextPolicyKey} circuit broken for {TotalSeconds} seconds due to: {ExceptionMessage}",
+                        context.PolicyKey, timeSpan.TotalSeconds, response.Exception.Message);
+                }, context => { logger.LogInformation("Policy {ContextPolicyKey} circuit reset", context.PolicyKey); }))
+            .AddPolicyHandler(HttpClientPolicy.GetTimeoutPolicy(
+                timeout, 
+                fallbackAction: _ =>
+            {
+                logger.LogWarning("Request timed out after {TotalSeconds}", timeout.TotalSeconds);
+                return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.RequestTimeout)
+                {
+                    Content = new StringContent("The request timed out.")
+                });
+            }));
 
         return services;
     }
