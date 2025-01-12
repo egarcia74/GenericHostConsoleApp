@@ -65,22 +65,30 @@ public static class HttpClientPolicy
     }
 
     /// <summary>
-    /// Creates and returns a Polly timeout policy for HTTP operations.
-    /// The policy cancels the request if it exceeds the specified timeout duration and supports optional fallback actions for failed requests.
+    /// Creates and returns a Polly timeout policy for handling HTTP requests with specified timeouts.
+    /// The policy allows for handling timeout scenarios and defines fallback logic for handling timed-out requests.
     /// </summary>
-    /// <param name="timeoutDuration">The maximum allowed duration for the HTTP operation before it times out. Defaults to a predefined value if not specified.</param>
-    /// <param name="fallbackAction">
-    /// An optional action invoked when a timeout occurs. This action can provide a fallback HTTP response and is executed asynchronously, receiving the cancellation token.
+    /// <param name="timeoutDuration">The maximum duration a request is allowed to run before timing out.</param>
+    /// <param name="timeoutStrategy">The timeout strategy to apply, such as optimistic or pessimistic timeouts.</param>
+    /// <param name="onTimeoutAsync">
+    /// A user-defined asynchronous callback invoked when a timeout occurs. Provides details about the context, timeout duration, task, and exception.
     /// </param>
-    /// <returns>An asynchronous timeout policy configured to enforce a timeout and optionally provide a fallback response upon timeout.</returns>
+    /// <param name="fallbackAction">
+    /// A fallback action executed when a timeout is handled. This action returns an alternative HttpResponseMessage on timeout.
+    /// </param>
+    /// <returns>An asynchronous timeout policy configured to enforce a timeout and apply fallback logic for timed-out requests.</returns>
     public static IAsyncPolicy<HttpResponseMessage> GetTimeoutPolicy(
-        TimeSpan timeoutDuration = default,
-        Func<CancellationToken, Task<HttpResponseMessage>>? fallbackAction = null)
+        TimeSpan timeoutDuration,
+        TimeoutStrategy timeoutStrategy,
+        Func<Context, TimeSpan, Task, Exception, Task> onTimeoutAsync,
+        Func<CancellationToken, Task<HttpResponseMessage>> fallbackAction)
     {
-        return Policy.TimeoutAsync<HttpResponseMessage>(timeoutDuration)
+        return Policy.TimeoutAsync<HttpResponseMessage>(timeoutDuration,
+                timeoutStrategy, // Ensure an optimistic strategy is used
+                onTimeoutAsync: onTimeoutAsync)
             .WrapAsync(
                 Policy<HttpResponseMessage>
                     .Handle<TimeoutRejectedException>()
-                    .FallbackAsync(fallbackAction!));
+                    .FallbackAsync(fallbackAction));
     }
 }

@@ -2,6 +2,7 @@ using GenericHostConsoleApp.Helpers;
 using GenericHostConsoleApp.Services.Interfaces;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Polly.Timeout;
 
 namespace GenericHostConsoleApp.Services;
 
@@ -171,6 +172,7 @@ public sealed class ApplicationHostedService : IHostedService, IDisposable
         {
             case TaskCanceledException:
             case OperationCanceledException:
+            case TimeoutRejectedException:
                 _logger.LogApplicationCanceled();
                 return ExitCode.Cancelled;
 

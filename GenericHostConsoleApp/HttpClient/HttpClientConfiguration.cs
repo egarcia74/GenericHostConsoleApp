@@ -1,6 +1,8 @@
+using System.Net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Polly.Timeout;
 
 namespace GenericHostConsoleApp.HttpClient;
 
@@ -75,28 +77,47 @@ public static class HttpClientConfiguration
                 {
                     logger.LogWarning(
                         "Policy {ContextPolicyKey} retry {RetryAttempt} for {ClientName}. Waiting {TotalSeconds} seconds. Exception: {ExceptionMessage}",
-                        context.PolicyKey, retryAttempt, clientName, timespan.TotalSeconds, outcome.Exception?.Message);
+                        context.PolicyKey, 
+                        retryAttempt, 
+                        clientName, 
+                        timespan.TotalSeconds, 
+                        outcome.Exception?.Message);
                 }))
             .AddPolicyHandler(HttpClientPolicy.GetCircuitBreakerPolicy(handledEventsBeforeBreaking, durationOfBreak,
-                onBreak: (response, timeSpan, context) =>
+                onBreak: (response, timespan, context) =>
                 {
                     logger.LogWarning(
-                        "Policy {ContextPolicyKey} circuit broken for {TotalSeconds} seconds due to: {ExceptionMessage}",
-                        context.PolicyKey, timeSpan.TotalSeconds, response.Exception.Message);
+                        "Policy {ContextPolicyKey} circuit broken for {TotalSeconds} seconds. Exception: {ExceptionMessage}",
+                        context.PolicyKey, 
+                        timespan.TotalSeconds, 
+                        response.Exception.Message);
                 },
                 onReset: context =>
                 {
                     logger.LogInformation("Policy {ContextPolicyKey} circuit reset", context.PolicyKey);
                 }))
-            .AddPolicyHandler(HttpClientPolicy.GetTimeoutPolicy(
-                timeout,
-                fallbackAction: _ =>
+            .AddPolicyHandler(HttpClientPolicy.GetTimeoutPolicy(timeout, TimeoutStrategy.Pessimistic,
+                onTimeoutAsync: (context, timespan, _, exception) =>
                 {
+                    // Log the timeout exception here if needed (optional)
+                    logger.LogWarning(
+                        "Policy {ContextPolicyKey} timeout occurred after {TotalSeconds} seconds. Exception: {ExceptionMessage}", 
+                        context.PolicyKey,
+                        timespan.TotalSeconds,
+                        exception.Message);
+                    
+                    return Task.CompletedTask;
+                },
+                fallbackAction: async (cancellationToken) =>
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                        
                     logger.LogWarning("Request timed out after {TotalSeconds}", timeout.TotalSeconds);
-                    return Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.RequestTimeout)
+
+                    return new HttpResponseMessage(HttpStatusCode.OK)
                     {
                         Content = new StringContent("The request timed out.")
-                    });
+                    };
                 }));
 
         return services;
