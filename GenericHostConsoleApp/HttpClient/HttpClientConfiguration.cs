@@ -114,10 +114,16 @@ public static class HttpClientConfiguration
                         
                     logger.LogWarning("Request timed out after {TotalSeconds}", timeout.TotalSeconds);
 
-                    return await Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                    return await Task.FromResult(new HttpResponseMessage(HttpStatusCode.RequestTimeout)
                     {
                         Content = new StringContent("The request timed out.")
                     });
+                },
+                onFallbackAsync: async result =>
+                {
+                    logger.LogWarning("Fallback executed for {ClientName}. Exception: {Message}", clientName, result.Exception?.Message);
+
+                    await Task.CompletedTask;
                 }));
 
         return services;

@@ -1,5 +1,4 @@
 using Polly;
-using Polly.CircuitBreaker;
 using Polly.Extensions.Http;
 using Polly.Timeout;
 
@@ -77,18 +76,22 @@ public static class HttpClientPolicy
     /// A fallback action executed when a timeout is handled. This action returns an alternative HttpResponseMessage on timeout.
     /// </param>
     /// <returns>An asynchronous timeout policy configured to enforce a timeout and apply fallback logic for timed-out requests.</returns>
-    public static IAsyncPolicy<HttpResponseMessage> GetTimeoutPolicy(
-        TimeSpan timeoutDuration,
-        TimeoutStrategy timeoutStrategy,
-        Func<Context, TimeSpan, Task, Exception, Task> onTimeoutAsync,
-        Func<CancellationToken, Task<HttpResponseMessage>> fallbackAction)
-    {
-        return Policy.TimeoutAsync<HttpResponseMessage>(timeoutDuration,
-                timeoutStrategy, // Ensure an optimistic strategy is used
-                onTimeoutAsync: onTimeoutAsync)
-            .WrapAsync(
-                Policy<HttpResponseMessage>
-                    .Handle<TimeoutRejectedException>()
-                    .FallbackAsync(fallbackAction));
-    }
+        public static IAsyncPolicy<HttpResponseMessage> GetTimeoutPolicy(
+            TimeSpan timeoutDuration,
+            TimeoutStrategy timeoutStrategy,
+            Func<Context, TimeSpan, Task, Exception, Task> onTimeoutAsync,
+            Func<CancellationToken, Task<HttpResponseMessage>> fallbackAction,
+            Func<DelegateResult<HttpResponseMessage>, Task> onFallbackAsync)
+        {
+            return Policy<HttpResponseMessage>
+                .Handle<TimeoutRejectedException>() // Handle timeout exceptions
+                .FallbackAsync(fallbackAction, onFallbackAsync)
+                .WrapAsync(
+                    Policy.TimeoutAsync<HttpResponseMessage>(
+                        timeoutDuration,
+                        timeoutStrategy,
+                        onTimeoutAsync
+                    )
+                );
+        }
 }
