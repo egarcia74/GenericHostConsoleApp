@@ -97,7 +97,7 @@ public static class HttpClientConfiguration
                     logger.LogInformation("Policy {ContextPolicyKey} circuit reset", context.PolicyKey);
                 }))
             .AddPolicyHandler(HttpClientPolicy.GetTimeoutPolicy(timeout, TimeoutStrategy.Pessimistic,
-                onTimeoutAsync: (context, timespan, _, exception) =>
+                onTimeoutAsync: async (context, timespan, _, exception) =>
                 {
                     // Log the timeout exception here if needed (optional)
                     logger.LogWarning(
@@ -106,7 +106,7 @@ public static class HttpClientConfiguration
                         timespan.TotalSeconds,
                         exception.Message);
                     
-                    return Task.CompletedTask;
+                    await Task.CompletedTask;
                 },
                 fallbackAction: async (cancellationToken) =>
                 {
@@ -114,10 +114,10 @@ public static class HttpClientConfiguration
                         
                     logger.LogWarning("Request timed out after {TotalSeconds}", timeout.TotalSeconds);
 
-                    return new HttpResponseMessage(HttpStatusCode.OK)
+                    return await Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
                     {
                         Content = new StringContent("The request timed out.")
-                    };
+                    });
                 }));
 
         return services;
