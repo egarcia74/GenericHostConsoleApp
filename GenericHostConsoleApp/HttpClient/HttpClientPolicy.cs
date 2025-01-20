@@ -67,22 +67,25 @@ public static class HttpClientPolicy
     }
 
     /// <summary>
-    ///     Creates and returns a Polly timeout policy for handling HTTP requests with specified timeouts.
-    ///     The policy allows for handling timeout scenarios and defines fallback logic for handling timed-out requests.
+    /// Creates and returns a Polly timeout policy for handling HTTP requests with specified timeouts.
+    /// The policy enforces a timeout duration, handles timeout scenarios, and applies fallback logic for timed-out requests.
     /// </summary>
-    /// <param name="timeoutDuration">The maximum duration a request is allowed to run before timing out.</param>
-    /// <param name="timeoutStrategy">The timeout strategy to apply, such as optimistic or pessimistic timeouts.</param>
+    /// <param name="timeoutDuration">The maximum duration allowed for a request before it times out.</param>
+    /// <param name="timeoutStrategy">Specifies the timeout strategy to use, such as optimistic or pessimistic.</param>
     /// <param name="onTimeoutAsync">
-    ///     A user-defined asynchronous callback invoked when a timeout occurs. Provides details about the context, timeout
-    ///     duration, task, and exception.
+    /// An asynchronous callback invoked when a timeout occurs, providing details about the request context,
+    /// timeout duration, the timed-out task, and the associated exception.
     /// </param>
     /// <param name="fallbackAction">
-    ///     A fallback action executed when a timeout is handled. This action returns an alternative HttpResponseMessage on
-    ///     timeout.
+    /// A fallback action executed when a timeout is handled. This action generates an alternative
+    /// <see cref="HttpResponseMessage"/> to use after a timeout.
+    /// </param>
+    /// <param name="onFallbackAsync">
+    /// An asynchronous callback triggered when the fallback action is executed, providing details about the fallback result.
     /// </param>
     /// <returns>
-    ///     An asynchronous timeout policy configured to enforce a timeout and apply fallback logic for timed-out
-    ///     requests.
+    /// An asynchronous timeout policy configured to enforce a timeout, manage timeout scenarios, and apply a fallback logic
+    /// for handling timed-out requests.
     /// </returns>
     public static IAsyncPolicy<HttpResponseMessage> GetTimeoutPolicy(
         TimeSpan timeoutDuration,
