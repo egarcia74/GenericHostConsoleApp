@@ -7,8 +7,8 @@ using Polly.Timeout;
 namespace GenericHostConsoleApp.HttpClient;
 
 /// <summary>
-/// A static class that provides methods for configuring HTTP clients
-/// with resilience and transient fault-handling policies using Polly integration.
+///     A static class that provides methods for configuring HTTP clients
+///     with resilience and transient fault-handling policies using Polly integration.
 /// </summary>
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
@@ -16,11 +16,14 @@ namespace GenericHostConsoleApp.HttpClient;
 public static class HttpClientConfiguration
 {
     /// <summary>
-    /// Registers HTTP clients with resilience and transient fault-handling policies using Polly.
+    ///     Registers HTTP clients with resilience and transient fault-handling policies using Polly.
     /// </summary>
-    /// <param name="services">The <see cref="IServiceCollection"/> to add the HTTP clients and policies to.</param>
-    /// <param name="configuration">The application's <see cref="IConfiguration"/> to provide necessary settings for the HTTP client setup.</param>
-    /// <returns>The same <see cref="IServiceCollection"/> instance so that multiple calls can be chained.</returns>
+    /// <param name="services">The <see cref="IServiceCollection" /> to add the HTTP clients and policies to.</param>
+    /// <param name="configuration">
+    ///     The application's <see cref="IConfiguration" /> to provide necessary settings for the HTTP
+    ///     client setup.
+    /// </param>
+    /// <returns>The same <see cref="IServiceCollection" /> instance so that multiple calls can be chained.</returns>
     // ReSharper disable once UnusedMethodReturnValue.Global
     public static IServiceCollection AddHttpClientsWithPolicies(
         this IServiceCollection services,
@@ -32,12 +35,12 @@ public static class HttpClientConfiguration
     }
 
     /// <summary>
-    /// Configures the OpenWeather HTTP client with a base address, default request headers,
-    /// and applies resilience and transient fault-handling policies such as retry, circuit breaker, and timeout.
+    ///     Configures the OpenWeather HTTP client with a base address, default request headers,
+    ///     and applies resilience and transient fault-handling policies such as retry, circuit breaker, and timeout.
     /// </summary>
-    /// <param name="services">The <see cref="IServiceCollection"/> to which the OpenWeather HTTP client is added.</param>
-    /// <param name="configuration">The <see cref="IConfiguration"/> used to retrieve the base address for the HTTP client.</param>
-    /// <returns>The same <see cref="IServiceCollection"/> instance to allow method chaining.</returns>
+    /// <param name="services">The <see cref="IServiceCollection" /> to which the OpenWeather HTTP client is added.</param>
+    /// <param name="configuration">The <see cref="IConfiguration" /> used to retrieve the base address for the HTTP client.</param>
+    /// <returns>The same <see cref="IServiceCollection" /> instance to allow method chaining.</returns>
     private static IServiceCollection AddOpenWeatherHttpClient(
         this IServiceCollection services,
         IConfiguration configuration)
@@ -73,45 +76,42 @@ public static class HttpClientConfiguration
             })
             .AddPolicyHandler(HttpClientPolicy.GetRetryPolicy(
                 retries,
-                sleepDurationProvider: (outcome, timespan, retryAttempt, context) =>
+                (outcome, timespan, retryAttempt, context) =>
                 {
                     logger.LogWarning(
                         "Policy {ContextPolicyKey} retry {RetryAttempt} for {ClientName}. Waiting {TotalSeconds} seconds. Exception: {ExceptionMessage}",
-                        context.PolicyKey, 
-                        retryAttempt, 
-                        clientName, 
-                        timespan.TotalSeconds, 
+                        context.PolicyKey,
+                        retryAttempt,
+                        clientName,
+                        timespan.TotalSeconds,
                         outcome.Exception?.Message);
                 }))
             .AddPolicyHandler(HttpClientPolicy.GetCircuitBreakerPolicy(handledEventsBeforeBreaking, durationOfBreak,
-                onBreak: (response, timespan, context) =>
+                (response, timespan, context) =>
                 {
                     logger.LogWarning(
                         "Policy {ContextPolicyKey} circuit broken for {TotalSeconds} seconds. Exception: {ExceptionMessage}",
-                        context.PolicyKey, 
-                        timespan.TotalSeconds, 
+                        context.PolicyKey,
+                        timespan.TotalSeconds,
                         response.Exception.Message);
                 },
-                onReset: context =>
-                {
-                    logger.LogInformation("Policy {ContextPolicyKey} circuit reset", context.PolicyKey);
-                }))
+                context => { logger.LogInformation("Policy {ContextPolicyKey} circuit reset", context.PolicyKey); }))
             .AddPolicyHandler(HttpClientPolicy.GetTimeoutPolicy(timeout, TimeoutStrategy.Pessimistic,
-                onTimeoutAsync: async (context, timespan, _, exception) =>
+                async (context, timespan, _, exception) =>
                 {
                     // Log the timeout exception here if needed (optional)
                     logger.LogWarning(
-                        "Policy {ContextPolicyKey} timeout occurred after {TotalSeconds} seconds. Exception: {ExceptionMessage}", 
+                        "Policy {ContextPolicyKey} timeout occurred after {TotalSeconds} seconds. Exception: {ExceptionMessage}",
                         context.PolicyKey,
                         timespan.TotalSeconds,
                         exception.Message);
-                    
+
                     await Task.CompletedTask;
                 },
-                fallbackAction: async (cancellationToken) =>
+                async cancellationToken =>
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                        
+
                     logger.LogWarning("Request timed out after {TotalSeconds}", timeout.TotalSeconds);
 
                     return await Task.FromResult(new HttpResponseMessage(HttpStatusCode.RequestTimeout)
@@ -119,9 +119,10 @@ public static class HttpClientConfiguration
                         Content = new StringContent("The request timed out.")
                     });
                 },
-                onFallbackAsync: async result =>
+                async result =>
                 {
-                    logger.LogWarning("Fallback executed for {ClientName}. Exception: {Message}", clientName, result.Exception?.Message);
+                    logger.LogWarning("Fallback executed for {ClientName}. Exception: {Message}", clientName,
+                        result.Exception?.Message);
 
                     await Task.CompletedTask;
                 }));

@@ -8,6 +8,5 @@ namespace GenericHostConsoleApp.Models.WeatherForecast;
 public record Wind
 {
     [JsonPropertyName("speed")] public double Speed { get; init; }
-
     [JsonPropertyName("deg")] public int Deg { get; init; }
 }

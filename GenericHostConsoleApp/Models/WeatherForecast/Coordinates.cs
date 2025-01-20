@@ -8,6 +8,5 @@ namespace GenericHostConsoleApp.Models.WeatherForecast;
 public record Coordinates
 {
     [JsonPropertyName("lon")] public double Lon { get; init; }
-
     [JsonPropertyName("lat")] public double Lat { get; init; }
 }
