@@ -74,28 +74,6 @@ public static class HttpClientConfiguration
                 client.BaseAddress = new Uri(baseAddress);
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             })
-            .AddPolicyHandler(HttpClientPolicy.GetRetryPolicy(
-                retries,
-                (outcome, timespan, retryAttempt, context) =>
-                {
-                    logger.LogWarning(
-                        "Policy {ContextPolicyKey} retry {RetryAttempt} for {ClientName}. Waiting {TotalSeconds} seconds. Exception: {ExceptionMessage}",
-                        context.PolicyKey,
-                        retryAttempt,
-                        clientName,
-                        timespan.TotalSeconds,
-                        outcome.Exception?.Message);
-                }))
-            .AddPolicyHandler(HttpClientPolicy.GetCircuitBreakerPolicy(handledEventsBeforeBreaking, durationOfBreak,
-                (response, timespan, context) =>
-                {
-                    logger.LogWarning(
-                        "Policy {ContextPolicyKey} circuit broken for {TotalSeconds} seconds. Exception: {ExceptionMessage}",
-                        context.PolicyKey,
-                        timespan.TotalSeconds,
-                        response.Exception.Message);
-                },
-                context => { logger.LogInformation("Policy {ContextPolicyKey} circuit reset", context.PolicyKey); }))
             .AddPolicyHandler(HttpClientPolicy.GetTimeoutPolicy(timeout, TimeoutStrategy.Pessimistic,
                 async (context, timespan, _, exception) =>
                 {
@@ -125,7 +103,30 @@ public static class HttpClientConfiguration
                         result.Exception?.Message);
 
                     await Task.CompletedTask;
-                }));
+                }))
+            .AddPolicyHandler(HttpClientPolicy.GetRetryPolicy(
+                retries,
+                (outcome, timespan, retryAttempt, context) =>
+                {
+                    logger.LogWarning(
+                        "Policy {ContextPolicyKey} retry {RetryAttempt} for {ClientName}. Waiting {TotalSeconds} seconds. Exception: {ExceptionMessage}",
+                        context.PolicyKey,
+                        retryAttempt,
+                        clientName,
+                        timespan.TotalSeconds,
+                        outcome.Exception?.Message);
+                }))
+            .AddPolicyHandler(HttpClientPolicy.GetCircuitBreakerPolicy(handledEventsBeforeBreaking, durationOfBreak,
+                (response, timespan, context) =>
+                {
+                    logger.LogWarning(
+                        "Policy {ContextPolicyKey} circuit broken for {TotalSeconds} seconds. Exception: {ExceptionMessage}",
+                        context.PolicyKey,
+                        timespan.TotalSeconds,
+                        response.Exception.Message);
+                },
+                context => { logger.LogInformation("Policy {ContextPolicyKey} circuit reset", context.PolicyKey); }))
+            ;
 
         return services;
     }
